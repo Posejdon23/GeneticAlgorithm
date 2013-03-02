@@ -21,20 +21,6 @@ public class Main extends Application {
         NewPop np = new NewPop(ps, 45, 20, 30);
         double[][] stats = np.populate(); //min,max, sum,avg
 
-        /*
-         Parameter[] pars = Funkcje.dekoduj(ps, "010101010101010101010101010101", 2);
-        
-
-
-         for (int i = 0; i < pars.length; i++) {
-         System.out.println(
-         pars[i].getName() + "\t\t"
-         + Math.round(pars[i].getValue() * 100.0) / 100.0 + 
-         ",\tz przedziału:\t(" + pars[i].getMinparm()
-         + " - " + pars[i].getMaxparm() + ")");
-         }
-         */
-
         stage.setTitle("Wykres dla statystyk kolejnych generacji");
         final NumberAxis xAxis = new NumberAxis();
         final NumberAxis yAxis = new NumberAxis();
