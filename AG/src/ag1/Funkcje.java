@@ -8,16 +8,18 @@ import java.util.Random;
 
 public class Funkcje {
 
-    public static final double PMUTATION = 0.0333;
-    public static final double PCROSS = 0.6;
+    private static double PMUTATION = 0.0333;
+    private static double PCROSS = 0.6;
     public static double maxPopFit;
-    public static final double mnożnikSkali = 1.2;
+    private static final double mnożnikSkali = 1.2;
     public static int licznikGen=0;
     public static int liczbaGen;
 
     public static Unit[] genGen(ParamSpec ps, int popsize, int length,
-            int lGen) {
-        liczbaGen = lGen; 
+            int lGen, double PMUTATION, double PCROSS) {
+        liczbaGen = lGen;
+        Funkcje.PMUTATION = PMUTATION;
+        Funkcje.PCROSS = PCROSS;
         Unit[] newpop = new Unit[popsize];
         Random random = new Random();
         StringBuilder sb;

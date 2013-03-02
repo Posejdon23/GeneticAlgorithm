@@ -13,6 +13,7 @@ import java.util.List;
  */
 public class ParamSpec {
     int liczbaParametrów;
+    int długośćCiągu = 0;
     
     List<Parameter> paramList;
     
@@ -23,6 +24,7 @@ public class ParamSpec {
     public void addParam(String pname, int długość, double min,double max){
         liczbaParametrów++;
         paramList.add(new Parameter(pname, długość, 0, min, max));
+        długośćCiągu +=długość;
     }
     public int getNumberOf(){
         return liczbaParametrów;
@@ -31,6 +33,9 @@ public class ParamSpec {
         Parameter[] p = new Parameter[liczbaParametrów];
         paramList.toArray(p);
         return p;
+    }
+    public int getAllelLength(){
+    	return długośćCiągu;
     }
 //    public Parameter getParamByName(String pname){
 //    }

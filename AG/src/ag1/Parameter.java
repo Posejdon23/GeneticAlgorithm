@@ -8,7 +8,7 @@ package ag1;
  *
  * @author kamil
  */
-public class Parameter {
+class Parameter {
     private int length;
     private String name;
     private double value,minparm,maxparm;

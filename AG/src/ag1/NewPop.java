@@ -8,18 +8,19 @@ public class NewPop {
     public double[][] stats;
     private ParamSpec ps;
 
-    public NewPop(ParamSpec ps, int liczbaGeneracji, int wielkośćPopulacji,
-            int długośćCiągu) {
+    public NewPop(ParamSpec ps, int liczbaGeneracji, int wielkośćPopulacji) {
         this.ps = ps;
         this.liczbaGeneracji = liczbaGeneracji;
         this.wielkośćPopulacji = wielkośćPopulacji;
-        this.długośćCiągu = długośćCiągu;
+        this.długośćCiągu = ps.getAllelLength();
         stats = new double[liczbaGeneracji][4];
+        
+        System.out.println("1:" + długośćCiągu);
     }
 
-    public double[][] populate() {
+    public double[][] populate(double pcross,double pmutation) {
         Unit[] populacja = Funkcje.genGen(ps, wielkośćPopulacji, długośćCiągu,
-                liczbaGeneracji); // ostatnie tylko dla wyswietlania w reprodukcji
+                liczbaGeneracji,pmutation,pcross); // ostatnie tylko dla wyswietlania w reprodukcji
         Unit[] newpop;
         //System.out.println("Generacja 0:");
         //Funkcje.statystyki(populacja);

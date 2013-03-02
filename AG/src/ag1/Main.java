@@ -17,9 +17,9 @@ public class Main extends Application {
         ps.addParam("2", 10, -512, 512);
         ps.addParam("3", 10, -512, 512);
 
-        //liczba generacji,wielkość populacji(PARZYSTA! >?), długość ciągu
-        NewPop np = new NewPop(ps, 45, 20, 30);
-        double[][] stats = np.populate(); //min,max, sum,avg
+        //liczba generacji,wielkość populacji(PARZYSTA! >?)
+        NewPop np = new NewPop(ps, 150, 50);
+        double[][] stats = np.populate(0.6,0.0333); //min,max, sum,avg
 
         stage.setTitle("Wykres dla statystyk kolejnych generacji");
         final NumberAxis xAxis = new NumberAxis();

@@ -13,14 +13,12 @@ public class Unit {
 	public Unit(ParamSpec ps, String allel){
             
 		this.allel=allel;
-                //long coef = (long)(Math.pow(2, allel.length()) - 1.0);
-		//this.x = Integer.parseInt(allel, 2); //DEKODOWANIE
-                params = Funkcje.dekoduj(ps, allel, 2);
+        this.params = Funkcje.dekoduj(ps, allel, 2);
 		this.fx = fPrzystosowania();
 	}
 	private String allel;
 	private double fx;
-        public Parameter[] params;
+    private Parameter[] params;
 	
 	public String getAllel() {
 		return allel;
