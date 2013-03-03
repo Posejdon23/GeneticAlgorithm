@@ -4,57 +4,68 @@
  */
 package ag1;
 
+import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleStringProperty;
+
 /**
  *
  * @author kamil
  */
-class Parameter {
-    private int length;
-    private String name;
-    private double value,minparm,maxparm;
+public class Parameter {
+    private SimpleIntegerProperty length;
+    private SimpleStringProperty name;
+    private SimpleDoubleProperty value,minparm,maxparm;
 
     public Parameter(String name, int length, double value, double minparm, double maxparm) {
-        this.name = name;
-        this.length = length;
-        this.value = value;
-        this.minparm = minparm;
-        this.maxparm = maxparm;
+    	this.name = new SimpleStringProperty(name);
+        this.length = new SimpleIntegerProperty(length);
+        this.value = new SimpleDoubleProperty(value);
+        this.minparm = new SimpleDoubleProperty(minparm);
+        this.maxparm = new SimpleDoubleProperty(maxparm);
+    }
+    public Parameter(String s1,String s2, String s3,String s4){
+    	this.name = new SimpleStringProperty(s1);
+        this.length = new SimpleIntegerProperty(Integer.parseInt(s2));
+        this.value = new SimpleDoubleProperty(0.0d);
+        this.minparm = new SimpleDoubleProperty(Double.parseDouble(s3));
+        this.maxparm = new SimpleDoubleProperty(Double.parseDouble(s4));
     }
 
     public int getLength() {
-        return length;
+        return length.get();
     }
 
     public String getName() {
-        return name;
+        return name.get();
     }
 
     public void setLength(int length) {
-        this.length = length;
+        this.length.set(length);
     }
 
     public double getValue() {
-        return value;
+        return value.get();
     }
 
     public void setValue(double value) {
-        this.value = value;
+        this.value.set(value);
     }
 
     public double getMinparm() {
-        return minparm;
+        return minparm.get();
     }
 
     public void setMinparm(double minparm) {
-        this.minparm = minparm;
+        this.minparm.set(minparm);
     }
 
     public double getMaxparm() {
-        return maxparm;
+        return maxparm.get();
     }
 
     public void setMaxparm(double maxparm) {
-        this.maxparm = maxparm;
+        this.maxparm.set(maxparm);
     }
     
 }
