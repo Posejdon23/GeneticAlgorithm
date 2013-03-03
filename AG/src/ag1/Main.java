@@ -13,9 +13,9 @@ public class Main extends Application {
     public void start(Stage stage) {
 
         ParamSpec ps = new ParamSpec();
-        ps.addParam("1", 10, -512, 512);
-        ps.addParam("2", 10, -512, 512);
-        ps.addParam("3", 10, -512, 512);
+        ps.addParam("1", 10, -10, 10);
+        ps.addParam("2", 10, -10, 10);
+        ps.addParam("3", 10, -10, 10);
 
         //liczba generacji,wielkość populacji(PARZYSTA! >?)
         NewPop np = new NewPop(ps, 150, 50);
