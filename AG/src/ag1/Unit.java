@@ -47,16 +47,19 @@ public class Unit {
 		    double wynik = 0;
 		    Object num = e.evaluate(context);
 		    if(num.getClass().equals(Long.class)){
+		    	//System.out.println("Long" + wynik);
 		    	wynik = ((Long)num).doubleValue();
 		    }
 			if(num.getClass().equals(Double.class)){
 				wynik= ((Double)num).doubleValue();	 
+				//System.out.println("Double" + wynik);
 			}
 			if(num.getClass().equals(Float.class)){
 				wynik= ((Float)num).doubleValue();	
+			//	System.out.println("Float" + wynik);
 			}
 			if(wynik<0) wynik=0.0d;
-		    return Math.round(wynik*1000)/1000;
+		    return wynik;
 
         }
 }

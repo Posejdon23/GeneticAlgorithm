@@ -12,17 +12,17 @@ import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Button;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
-import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 
 public class Main extends Application {
 
@@ -179,6 +179,18 @@ public class Main extends Application {
 				grid.add(addChart(), 1, 0, 1, 14);
 			}
 		});
+		
+		final ContextMenu contextMenu = new ContextMenu();
+
+		MenuItem item1 = new MenuItem("Usuń parametr");
+		item1.setOnAction(new EventHandler<ActionEvent>() {
+		    public void handle(ActionEvent e) {
+		       
+		       data.remove(paramTab.getSelectionModel().getSelectedItem());
+		    }
+		});
+		contextMenu.getItems().addAll(item1);
+		paramTab.setContextMenu(contextMenu);
 
 		Scene scene = new Scene(grid, 800, 600);
 		stage.setTitle("Algorytm genetyczny");
@@ -237,7 +249,12 @@ public class Main extends Application {
 		for (int i = 0; i < stats.length; i++) {
 			series4.getData().add(new XYChart.Data(i, stats[i][3]));
 		}
-
+//		for(int i=0;i<stats.length;i++){
+//			for(int j = 0;j<stats[0].length;j++){
+//				System.out.print(stats[i][j] + "\t");
+//			}
+//			System.out.println();
+//		}
 		wykres.getData().addAll(series1, series2, series4);
 		return wykres;
 	}
