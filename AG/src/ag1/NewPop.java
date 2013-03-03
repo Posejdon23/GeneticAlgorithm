@@ -7,20 +7,20 @@ public class NewPop {
     public int długośćCiągu;
     public double[][] stats;
     private ParamSpec ps;
+    private static String fitFunction;
 
-    public NewPop(ParamSpec ps, int liczbaGeneracji, int wielkośćPopulacji) {
+    public NewPop(ParamSpec ps, int liczbaGeneracji, int wielkośćPopulacji,String fitFunction) {
         this.ps = ps;
         this.liczbaGeneracji = liczbaGeneracji;
         this.wielkośćPopulacji = wielkośćPopulacji;
         this.długośćCiągu = ps.getAllelLength();
         stats = new double[liczbaGeneracji][4];
-        
-        System.out.println("1:" + długośćCiągu);
+        NewPop.fitFunction = fitFunction;
     }
 
-    public double[][] populate(double pcross,double pmutation) {
+    public double[][] populate(double pcross,double pmutation,double scale) {
         Unit[] populacja = Funkcje.genGen(ps, wielkośćPopulacji, długośćCiągu,
-                liczbaGeneracji,pmutation,pcross); // ostatnie tylko dla wyswietlania w reprodukcji
+                liczbaGeneracji,pmutation,pcross, scale, fitFunction); // ostatnie tylko dla wyswietlania w reprodukcji
         Unit[] newpop;
         //System.out.println("Generacja 0:");
         //Funkcje.statystyki(populacja);

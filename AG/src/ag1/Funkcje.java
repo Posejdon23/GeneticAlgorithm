@@ -8,18 +8,21 @@ import java.util.Random;
 
 public class Funkcje {
 
-    private static double PMUTATION = 0.0333;
-    private static double PCROSS = 0.6;
+    private static double PMUTATION;
+    private static double PCROSS;
     public static double maxPopFit;
-    private static final double mnożnikSkali = 1.2;
+    private static double mnożnikSkalowania;
     public static int licznikGen=0;
     public static int liczbaGen;
+    public static String fitFunction;
 
     public static Unit[] genGen(ParamSpec ps, int popsize, int length,
-            int lGen, double PMUTATION, double PCROSS) {
+            int lGen, double PMUTATION, double PCROSS,double scale, String fitFunction) {
+    	Funkcje.fitFunction = fitFunction;
         liczbaGen = lGen;
         Funkcje.PMUTATION = PMUTATION;
         Funkcje.PCROSS = PCROSS;
+        Funkcje.mnożnikSkalowania = scale;
         Unit[] newpop = new Unit[popsize];
         Random random = new Random();
         StringBuilder sb;
@@ -32,7 +35,7 @@ public class Funkcje {
                     sb.append((char) 49);
                 }
             }
-            newpop[i] = new Unit(ps, sb.toString());
+            newpop[i] = new Unit(ps, sb.toString(),fitFunction);
         }
         return newpop;
 
@@ -80,18 +83,19 @@ public static int wybierz(double sumaFit, Unit populacja[]) {
             } else {
                 sNew = new String[]{s1, s2};
             }
-            Unit unit1 = new Unit(ps, sNew[0]);
-            Unit unit2 = new Unit(ps, sNew[1]);
+            Unit unit1 = new Unit(ps, sNew[0],fitFunction);
+            Unit unit2 = new Unit(ps, sNew[1],fitFunction);
             newpop[j] = unit1;
             newpop[j + 1] = unit2;
-            if((j==6) && (licznikGen == 0 || licznikGen==liczbaGen-1)){
-                System.out.println("Czterech typowych przedstawicieli generacji " + 
-                        (licznikGen+1) + ":");
-                for(int i=0;i<4;i++){
-                    //System.out.println("popsize: " + popsize);
-                    System.out.println(newpop[i].getAllel());
-                }
-            } 
+            
+//            if((j==6) && (licznikGen == 0 || licznikGen==liczbaGen-1)){
+//                System.out.println("Czterech typowych przedstawicieli generacji " + 
+//                        (licznikGen+1) + ":");
+//                for(int i=0;i<4;i++){
+//                    //System.out.println("popsize: " + popsize);
+//                    System.out.println(newpop[i].getAllel());
+//                }
+//            } 
         }
         licznikGen++;
         return new Object[]{newpop,stats};
@@ -159,10 +163,10 @@ public static int wybierz(double sumaFit, Unit populacja[]) {
     private static double[] preskala(double umin, double umax, double uavg) { 
         double delta, a, b;
 
-        if (umin > ((mnożnikSkali * uavg - umax) / (mnożnikSkali - 1.0))) {
+        if (umin > ((mnożnikSkalowania * uavg - umax) / (mnożnikSkalowania - 1.0))) {
             delta = umax - uavg;
-            a = ((mnożnikSkali - 1.0) * uavg) / delta;
-            b = uavg * (umax - mnożnikSkali * uavg) / delta;
+            a = ((mnożnikSkalowania - 1.0) * uavg) / delta;
+            b = uavg * (umax - mnożnikSkalowania * uavg) / delta;
         } else {
             delta = uavg - umin;
             a = uavg / delta;
@@ -211,18 +215,19 @@ public static int wybierz(double sumaFit, Unit populacja[]) {
         return new String[]{mutacja(s1New), mutacja(s2New)};
     }
     public static Parameter[] dekoduj(ParamSpec ps, String allel,int poz){
+    	
         int liczbaParametrów = ps.getNumberOf();
         Parameter[] params = ps.getParams();
-        int allDł = allel.length();
-        int suma = 0;
-        for(Parameter p : params){
-            suma += p.getLength();
-        }
-        if(allDł != suma){
-            System.err.print("Błąd. Suma długości parametrów musi być "
-                    + "równa długości allela.");
-            return null;
-        }
+//        int allDł = allel.length();
+//        int suma = 0;
+//        for(Parameter p : params){
+//            suma += p.getLength();
+//        }
+//        if(allDł != suma){
+//            System.err.print("Błąd. Suma długości parametrów musi być "
+//                    + "równa długości allela.");
+//            return null;
+//        }
         int wskaźnik = 0;
         Parameter[] parametry = new Parameter[liczbaParametrów];
         String subs = null;

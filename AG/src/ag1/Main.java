@@ -21,6 +21,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 
 public class Main extends Application {
@@ -28,8 +29,9 @@ public class Main extends Application {
 	private double[][] stats;
 	private TableView<Parameter> paramTab = new TableView<Parameter>();
 	private final ObservableList<Parameter> data = FXCollections
-			.observableArrayList();
-	private TextField popSize, genSize, pcross, pmutation;
+			.observableArrayList(new Parameter("a", "3", "-10", "10"),
+					new Parameter("b", "3", "-10", "10"));
+	private TextField fitFunction, popSize, genSize, pcross, pmutation,scale;
 	private LineChart<Number, Number> wykres;
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -37,20 +39,27 @@ public class Main extends Application {
 	public void start(Stage stage) {
 
 		paramTab.setEditable(true);
-		paramTab.setTableMenuButtonVisible(true);
 		TableColumn paramNameCol = new TableColumn("Nazwa parametru");
-		paramNameCol.setCellValueFactory(new PropertyValueFactory<Parameter, String>("name"));
-		
+		paramNameCol
+				.setCellValueFactory(new PropertyValueFactory<Parameter, String>(
+						"name"));
+
 		TableColumn paramSizeCol = new TableColumn("Liczba pozycji kodujących");
-		paramSizeCol.setCellValueFactory(new PropertyValueFactory<Parameter, String>("length"));
-		
+		paramSizeCol
+				.setCellValueFactory(new PropertyValueFactory<Parameter, String>(
+						"length"));
+
 		TableColumn zakresCols = new TableColumn("Zakres Wartości");
-		
+
 		TableColumn paramMinCol = new TableColumn("Min");
-		paramMinCol.setCellValueFactory(new PropertyValueFactory<Parameter, String>("minparm"));
+		paramMinCol
+				.setCellValueFactory(new PropertyValueFactory<Parameter, String>(
+						"minparm"));
 		TableColumn paramMaxCol = new TableColumn("Max");
-		paramMaxCol.setCellValueFactory(new PropertyValueFactory<Parameter, String>("maxparm"));
-		
+		paramMaxCol
+				.setCellValueFactory(new PropertyValueFactory<Parameter, String>(
+						"maxparm"));
+
 		zakresCols.getColumns().addAll(paramMinCol, paramMaxCol);
 
 		paramTab.getColumns().addAll(paramNameCol, paramSizeCol, zakresCols);
@@ -92,53 +101,82 @@ public class Main extends Application {
 		grid.setVgap(10);
 		grid.setPadding(new Insets(5, 25, 25, 25));
 
-		Label title = new Label("Parametry algorytmu:");
-		title.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
+		Label title = new Label("Parametry populacji:");
+		//title.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
 		grid.add(title, 0, 0);
 
 		grid.add(paramTab, 0, 1);
 		grid.add(addingBox, 0, 2);
 
+		final Label fitFunctionLabel = new Label("Funkcja przystosowania");
+		//fitFunctionLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
+		grid.add(fitFunctionLabel, 0, 3);
+		fitFunction = new TextField();
+		fitFunction.setText("a+b");
+		grid.add(fitFunction, 0, 4);
+
 		final Label popSizeLabel = new Label("Wielkość populacji");
-		popSizeLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
-		grid.add(popSizeLabel, 0, 3);
+		//popSizeLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
+		grid.add(popSizeLabel, 0, 5);
 		popSize = new TextField();
-		grid.add(popSize, 0, 4);
+		popSize.setText("100");
+		grid.add(popSize, 0, 6);
 
 		final Label genSizeLabel = new Label("Liczba generacji");
-		genSizeLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
-		grid.add(genSizeLabel, 0, 5);
+		//genSizeLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
+		grid.add(genSizeLabel, 0, 7);
 		genSize = new TextField();
-		grid.add(genSize, 0, 6);
+		genSize.setText("20");
+		grid.add(genSize, 0, 8);
 
-		final Label pcrossLabel = new Label("Prawdopodobieństwo krzyżowania");
-		pcrossLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
-		grid.add(pcrossLabel, 0, 7);
+		final Label pLabel = new Label("           Prawdopodobieństwo");
+		//pLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
+		grid.add(pLabel, 0, 9);
+
+		final Label pcrossLabel = new Label("        Krzyżowania");
+		//pcrossLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
 		pcross = new TextField();
-		grid.add(pcross, 0, 8);
+		pcross.setText("0.6");
 
-		final Label pmutationLabel = new Label("Prawdopodobieństwo mutacji");
-		pmutationLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
-		grid.add(pmutationLabel, 0, 9);
+		final Label pmutationLabel = new Label("                            Mutacji");
+		//pmutationLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
 		pmutation = new TextField();
-		grid.add(pmutation, 0, 10);
+		pmutation.setText("0.01");
+
+		HBox pboxL = new HBox();
+		pboxL.getChildren().addAll(pcrossLabel, pmutationLabel);
+
+		HBox pbox = new HBox();
+		pbox.getChildren().addAll(pcross, pmutation);
+		grid.add(pboxL, 0, 10);
+		grid.add(pbox, 0, 11);
+		
+		final Label scaleLabel = new Label("Współczynnik skalowania");
+		//scaleLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
+		grid.add(scaleLabel, 0, 12);
+		scale = new TextField();
+		scale.setText("2");
+		grid.add(scale, 0, 13);
 
 		Button rysujBtn = new Button("Rysuj wykres");
-		HBox hbBtn = new HBox(11);
+		HBox hbBtn = new HBox();
 		hbBtn.setAlignment(Pos.BOTTOM_RIGHT);
 		hbBtn.getChildren().add(rysujBtn);
-		grid.add(hbBtn, 0, 12);
+		grid.add(hbBtn, 0, 14);
 		rysujBtn.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent e) {
+
 				oblicz(Integer.parseInt(popSize.getText()),
 						Integer.parseInt(genSize.getText()),
-								Double.parseDouble(pcross.getText()),
-								Double.parseDouble(pmutation.getText()));
+						Double.parseDouble(pcross.getText()),
+						Double.parseDouble(pmutation.getText()),
+						Double.parseDouble(scale.getText()),
+						fitFunction.getText());
 				if (grid.getChildren().contains(wykres)) {
 					grid.getChildren().remove(wykres);
 				}
-				grid.add(addChart(), 1, 0, 1, 12);
+				grid.add(addChart(), 1, 0, 1, 14);
 			}
 		});
 
@@ -146,7 +184,6 @@ public class Main extends Application {
 		stage.setTitle("Algorytm genetyczny");
 		stage.setScene(scene);
 		stage.show();
-
 	}
 
 	public static void main(String[] args) {
@@ -154,25 +191,26 @@ public class Main extends Application {
 	}
 
 	private void oblicz(int popSize, int genSize, double pcross,
-			double pmutation) {
+			double pmutation, double scale, String fitFunction) {
 		ParamSpec ps = new ParamSpec();
-		Parameter[] params = new Parameter[data.size()]; 
-				data.toArray(params);
-		for(Parameter p : params){
-			System.out.println(p.getName());
-			ps.addParam(p.getName(), p.getLength(),p.getMinparm(),p.getMaxparm());	
+		Parameter[] params = new Parameter[data.size()];
+		data.toArray(params);
+		for (Parameter p : params) {
+			ps.addParam(p.getName(), p.getLength(), p.getMinparm(),
+					p.getMaxparm());
 		}
 		// liczba generacji,wielkość populacji(PARZYSTA! >?)
-		NewPop np = new NewPop(ps, popSize, genSize);
-		stats = np.populate(pcross, pmutation); // min,max, sum,avg
+		NewPop np = new NewPop(ps, genSize, popSize, fitFunction);
+		stats = np.populate(pcross, pmutation, scale); // min,max, sum,avg
 
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private LineChart addChart() {
 		final NumberAxis xAxis = new NumberAxis();
+		xAxis.setLabel("Kolejne generacje");
 		final NumberAxis yAxis = new NumberAxis();
-		xAxis.setLabel("Generacja");
+		yAxis.setLabel("Przystosowanie");
 		wykres = new LineChart<Number, Number>(xAxis, yAxis);
 
 		wykres.setTitle("Wykres przystosowania");
