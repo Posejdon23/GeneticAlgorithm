@@ -1,0 +1,5 @@
+@CHARSET "UTF-8";
+.root {
+	-fx-background-color: rgb(202,255,167);
+	-fx-vertical-grid-lines-visible: true
+}
