@@ -127,10 +127,9 @@ public static int wybierz(double sumaFit, Unit populacja[]) {
         double[] wsp = preskala(minFit, maxFit, średniaFit);
         double a = wsp[0];
         double b = wsp[1];
-        System.out.println("a:" + a + " b: " + b);
+        //System.out.println("a:" + a + " b: " + b);
         int popsize = populacja.length;
         double minFit2 = populacja[0].getFx();
-        if(a==1 && b==0) minFit2=0;
         double maxFit2 = minFit2;
         double sumaFit2 = 0;
         double fitness2 = 0;
@@ -148,33 +147,36 @@ public static int wybierz(double sumaFit, Unit populacja[]) {
             sumaFit2 += fitness2;     
         }
         double średniaFit2 = sumaFit2 / popsize;
+//        System.out.println("Suma: " + sumaFit2);
+//        System.out.println("Srednia: " + średniaFit2);
     
         double[] stats = new double[]{minFit2, maxFit2, sumaFit2, średniaFit2};
         Object[] objects = new Object[]{populacja, stats};
-        // System.out.println("Suma przystowowania populacji: " + sumaFit2);
-        // System.out.println("Przystowowanie min: " + minFit2);
-        // System.out.println("Przystowowanie max: " + maxFit2);
-        // System.out.println("Przystowowanie średnie: " + średniaFit2);
+//         System.out.println("Suma przystowowania populacji: " + sumaFit2);
+//         System.out.println("Przystowowanie min: " + minFit2);
+//         System.out.println("Przystowowanie max: " + maxFit2);
+//         System.out.println("Przystowowanie średnie: " + średniaFit2);
+        //for(Unit u : populacja)
+       // System.out.println(u.getAllel());
+        
         return objects;
     }
 
     private static double[] preskala(double umin, double umax, double uavg) { 
         double delta, a, b;
-
         if((umax-uavg)==0){
         	a=1;
         	b=0;
-        }else {
-	        if (umin > ((mnożnikSkalowania * uavg - umax) / (mnożnikSkalowania - 1.0))) {
-	            delta = umax - uavg;
-	            a = ((mnożnikSkalowania - 1.0) * uavg) / delta;
-	            b = uavg * (umax - mnożnikSkalowania * uavg) / delta;
-	        } else {
-	            delta = uavg - umin;
-	            a = uavg / delta;
-	            b = -umin * uavg / delta;
-	
-	        }
+        	return new double[]{a, b};
+        }
+        if (umin > ((mnożnikSkalowania * uavg - umax) / (mnożnikSkalowania - 1.0))) {
+            delta = umax - uavg;
+            a = ((mnożnikSkalowania - 1.0) * uavg) / delta;
+            b = uavg * (umax - mnożnikSkalowania * uavg) / delta;
+        } else {
+            delta = uavg - umin;
+            a = uavg / delta;
+            b = -umin * uavg / delta;
         }
         return new double[]{a, b};
     }

@@ -6,7 +6,9 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
+import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
+import javafx.geometry.VPos;
 import javafx.scene.Scene;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
@@ -15,6 +17,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.Separator;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
@@ -22,7 +25,6 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
 
 public class Main extends Application {
 
@@ -39,6 +41,7 @@ public class Main extends Application {
 	public void start(Stage stage) {
 
 		paramTab.setEditable(true);
+		paramTab.setPickOnBounds(true);
 		TableColumn paramNameCol = new TableColumn("Nazwa parametru");
 		paramNameCol
 				.setCellValueFactory(new PropertyValueFactory<Parameter, String>(
@@ -100,6 +103,14 @@ public class Main extends Application {
 		grid.setHgap(10);
 		grid.setVgap(10);
 		grid.setPadding(new Insets(5, 25, 25, 25));
+		 final Separator sepVert = new Separator();
+		 sepVert.setStyle("-fx-background-color:#e79423;-fx-background-radius:2");
+	        sepVert.setOrientation(Orientation.VERTICAL);
+	        sepVert.setValignment(VPos.CENTER);
+	        sepVert.setPrefWidth(5);
+	        GridPane.setConstraints(sepVert, 1, 1);
+	        GridPane.setRowSpan(sepVert, 14);
+	        grid.getChildren().add(sepVert);
 
 		Label title = new Label("Parametry populacji:");
 		//title.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
