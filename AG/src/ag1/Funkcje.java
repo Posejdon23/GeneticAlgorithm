@@ -147,17 +147,10 @@ public static int wybierz(double sumaFit, Unit populacja[]) {
             sumaFit2 += fitness2;     
         }
         double średniaFit2 = sumaFit2 / popsize;
-//        System.out.println("Suma: " + sumaFit2);
-//        System.out.println("Srednia: " + średniaFit2);
+
     
         double[] stats = new double[]{minFit2, maxFit2, sumaFit2, średniaFit2};
         Object[] objects = new Object[]{populacja, stats};
-//         System.out.println("Suma przystowowania populacji: " + sumaFit2);
-//         System.out.println("Przystowowanie min: " + minFit2);
-//         System.out.println("Przystowowanie max: " + maxFit2);
-//         System.out.println("Przystowowanie średnie: " + średniaFit2);
-        //for(Unit u : populacja)
-       // System.out.println(u.getAllel());
         
         return objects;
     }

@@ -1,17 +1,12 @@
 package ag1;
 
 import javafx.application.Application;
-import javafx.beans.binding.NumberBinding;
-import javafx.beans.property.SimpleDoubleProperty;
 import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
-import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
-import javafx.geometry.VPos;
 import javafx.scene.Scene;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
@@ -20,17 +15,15 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
-import javafx.scene.control.Separator;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.effect.DropShadow;
+import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
 public class Main extends Application {
@@ -38,38 +31,34 @@ public class Main extends Application {
 	private double[][] stats;
 	private TableView<Parameter> paramTab = new TableView<Parameter>();
 	private final ObservableList<Parameter> data = FXCollections
-			.observableArrayList(new Parameter("a", "3", "-10", "10"),
-					new Parameter("b", "3", "-10", "10"));
+			.observableArrayList(new Parameter("a", "5", "-10", "10"),
+					new Parameter("b", "5", "-10", "10"));
 	private TextField fitFunction, popSize, genSize, pcross, pmutation, scale;
 	private LineChart<Number, Number> wykres;
 	private Stage stage;
+	private GridPane grid;
+	private boolean isWykres = false;
+	private double minH=30;
 
 	@Override
 	public void start(final Stage stage) {
 
 		this.stage = stage;
-		final GridPane grid = new GridPane();
+		grid = new GridPane();
 		grid.setAlignment(Pos.TOP_LEFT);
 		grid.setHgap(10);
 		grid.setVgap(10);
-		grid.setPadding(new Insets(5, 25, 25, 25));
-		final Separator sepVert = new Separator();
-		sepVert.setStyle("-fx-background-color:#e79423;-fx-background-radius:2");
-		sepVert.setOrientation(Orientation.VERTICAL);
-		sepVert.setValignment(VPos.CENTER);
-		sepVert.setPrefWidth(5);
-		GridPane.setConstraints(sepVert, 2, 1);
-		GridPane.setRowSpan(sepVert, 14);
-		grid.getChildren().add(sepVert);
-
+		grid.setPadding(new Insets(10, 10, 25, 25));
+		grid.setStyle("-fx-background-color:#1d1d1d");
 		wykresSettings(grid);
 
 		final Label fitFunctionLabel = new Label("Funkcja przystosowania");
 		// fitFunctionLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
+		fitFunctionLabel.setMinWidth(200);
 		grid.add(fitFunctionLabel, 0, 3,1,1);
 		fitFunction = new TextField();
 		fitFunction.setText("a+b");
-		fitFunction.setMinHeight(20);
+		fitFunction.setMinHeight(minH);
 		grid.add(fitFunction, 1, 3,1,1);
 
 		final Label popSizeLabel = new Label("Wielkość populacji");
@@ -77,7 +66,7 @@ public class Main extends Application {
 		grid.add(popSizeLabel, 0, 5);
 		popSize = new TextField();
 		popSize.setText("100");
-		popSize.setMinHeight(20);
+		popSize.setMinHeight(minH);
 		grid.add(popSize, 1, 5);
 
 		final Label genSizeLabel = new Label("Liczba generacji");
@@ -85,20 +74,20 @@ public class Main extends Application {
 		grid.add(genSizeLabel, 0, 7);
 		genSize = new TextField();
 		genSize.setText("20");
-		genSize.setMinHeight(20);
+		genSize.setMinHeight(minH);
 		grid.add(genSize, 1, 7);
 
 		final Label pcrossLabel = new Label("Ppb. krzyżowania");
 		// pcrossLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
 		pcross = new TextField();
 		pcross.setText("0.6");
-		pcross.setMinHeight(20);
+		pcross.setMinHeight(minH);
 
 		final Label pmutationLabel = new Label("Ppb mutacji");
 		// pmutationLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
 		pmutation = new TextField();
 		pmutation.setText("0.01");
-		pmutation.setMinHeight(20);
+		pmutation.setMinHeight(minH);
 		
 		grid.add(pcrossLabel, 0, 9);
 		grid.add(pcross, 1, 9);
@@ -107,18 +96,24 @@ public class Main extends Application {
 		
 		final Label scaleLabel = new Label("Współczynnik skalowania");
 		// scaleLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
+		scaleLabel.setMinWidth(200);
 		grid.add(scaleLabel, 0, 11);
 		scale = new TextField();
-		scale.setText("2");
-		scale.setMinHeight(20);
+		scale.setText("1.4");
+		scale.setMinHeight(minH);
+		
 		grid.add(scale, 1, 11);
 
 		final Button wyczyśćBtn = new Button("Wyczyść wykres");
 		wyczyśćBtn.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent e) {
-				grid.getChildren().remove(wykres);
-				stage.setWidth(500);
+				
+				if(isWykres)
+					grid.getChildren().remove(wykres);
+
+				stage.setWidth(paramTab.widthProperty().doubleValue());
+				isWykres=false;
 			}
 		});
 
@@ -126,20 +121,22 @@ public class Main extends Application {
 		rysujBtn.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent e) {
-
+				
 				oblicz(Integer.parseInt(popSize.getText()),
 						Integer.parseInt(genSize.getText()),
 						Double.parseDouble(pcross.getText()),
 						Double.parseDouble(pmutation.getText()),
 						Double.parseDouble(scale.getText()),
 						fitFunction.getText());
-				if (grid.getChildren().contains(wykres)) {
+				
+				if(!isWykres){
+					paramTab.prefWidthProperty().bind(grid.widthProperty().divide(2));
+					stage.setWidth(2.0 * grid.widthProperty().doubleValue());
+				} else{
 					grid.getChildren().remove(wykres);
 				}
 				grid.add(addChart(), 2, 0, 1, 13);
-				stage.setWidth(1000);
-				wykres.prefWidthProperty().bind(grid.widthProperty().divide(2));
-				wykres.prefHeightProperty().bind(grid.heightProperty());
+				isWykres=true;
 			}
 		});
 
@@ -171,6 +168,7 @@ public class Main extends Application {
 		Scene scene = new Scene(grid, 500, 600);
 		stage.centerOnScreen();
 		stage.setMinHeight(500);
+		stage.setMinWidth(500);
 
 		stage.setTitle("Prosty algorytm genetyczny");
 
@@ -178,6 +176,7 @@ public class Main extends Application {
 		scene.getStylesheets().add(
 				Main.class.getResource("Styl.css").toExternalForm());
 		stage.setScene(scene);
+		this.stage.getIcons().add(new Image("file:resources/images/icon.png"));
 		stage.show();
 	}
 
@@ -204,7 +203,7 @@ public class Main extends Application {
 				.setCellValueFactory(new PropertyValueFactory<Parameter, String>(
 						"maxparm"));	
 		paramNameCol.prefWidthProperty().bind(paramTab.widthProperty().divide(4));
-		paramSizeCol.prefWidthProperty().bind(paramTab.widthProperty().divide(4));
+		paramSizeCol.prefWidthProperty().bind(paramTab.widthProperty().divide(4.1));
 		paramMinCol.prefWidthProperty().bind(paramTab.widthProperty().divide(4));
 		paramMaxCol.prefWidthProperty().bind(paramTab.widthProperty().divide(4));
 		//paramNameCol.setPrefWidth(120);
@@ -215,18 +214,23 @@ public class Main extends Application {
 
 		titleCol.getColumns().addAll(paramNameCol, paramSizeCol, zakresCols);
 		paramTab.getColumns().addAll(titleCol);
-		paramTab.prefHeightProperty().bind(stage.heightProperty().divide(2));
+		paramTab.prefHeightProperty().bind(stage.heightProperty().divide(1.4));
+		paramTab.prefWidthProperty().bind(stage.widthProperty());
 		paramTab.setItems(data);
 		grid.add(paramTab, 0, 1,2,1);
 
 		final TextField addName = new TextField();
 		addName.setPromptText("Nazwa parametru");
+		addName.setMinHeight(minH);
 		final TextField addLength = new TextField();
 		addLength.setPromptText("Długość");
+		addLength.setMinHeight(minH);
 		final TextField addMinVal = new TextField();
 		addMinVal.setPromptText("Min");
+		addMinVal.setMinHeight(minH);
 		final TextField addMaxVal = new TextField();
 		addMaxVal.setPromptText("Max");
+		addMaxVal.setMinHeight(minH);
 		
 		addName.prefWidthProperty().bind(stage.widthProperty().divide(4));
 		addLength.prefWidthProperty().bind(stage.widthProperty().divide(4));
@@ -249,6 +253,7 @@ public class Main extends Application {
 		HBox addingBox = new HBox();
 		addingBox.getChildren().addAll(addName, addLength, addMinVal,
 				addMaxVal, addButton);
+		addingBox.setSpacing(7);
 		addingBox.prefWidthProperty().bind(paramTab.widthProperty());
 		grid.add(addingBox, 0, 2, 2, 1);
 		final ContextMenu contextMenu = new ContextMenu();
@@ -292,7 +297,8 @@ public class Main extends Application {
 		wykres = new LineChart<Number, Number>(xAxis, yAxis);
 
 		wykres.setTitle("Wykres przystosowania dla kolejnych generacji");
-
+		wykres.prefWidthProperty().bind(grid.widthProperty().divide(2));
+		wykres.prefHeightProperty().bind(grid.heightProperty());
 		XYChart.Series series1 = new XYChart.Series();
 		series1.setName("Min");
 		for (int i = 0; i < stats.length; i++) {
@@ -315,12 +321,6 @@ public class Main extends Application {
 		for (int i = 0; i < stats.length; i++) {
 			series4.getData().add(new XYChart.Data(i, stats[i][3]));
 		}
-		// for(int i=0;i<stats.length;i++){
-		// for(int j = 0;j<stats[0].length;j++){
-		// System.out.print(stats[i][j] + "\t");
-		// }
-		// System.out.println();
-		// }
 		wykres.getData().addAll(series1, series2, series4);
 		return wykres;
 	}
