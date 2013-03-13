@@ -38,7 +38,8 @@ public class Main extends Application {
 	private Stage stage;
 	private GridPane grid;
 	private boolean isWykres = false;
-	private double minH=30;
+	private boolean dodawanie = false;
+	private double minH = 30;
 
 	@Override
 	public void start(final Stage stage) {
@@ -55,11 +56,11 @@ public class Main extends Application {
 		final Label fitFunctionLabel = new Label("Funkcja przystosowania");
 		// fitFunctionLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
 		fitFunctionLabel.setMinWidth(200);
-		grid.add(fitFunctionLabel, 0, 3,1,1);
+		grid.add(fitFunctionLabel, 0, 3, 1, 1);
 		fitFunction = new TextField();
 		fitFunction.setText("a+b");
 		fitFunction.setMinHeight(minH);
-		grid.add(fitFunction, 1, 3,1,1);
+		grid.add(fitFunction, 1, 3, 1, 1);
 
 		final Label popSizeLabel = new Label("Wielkość populacji");
 		// popSizeLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
@@ -88,12 +89,12 @@ public class Main extends Application {
 		pmutation = new TextField();
 		pmutation.setText("0.01");
 		pmutation.setMinHeight(minH);
-		
+
 		grid.add(pcrossLabel, 0, 9);
 		grid.add(pcross, 1, 9);
 		grid.add(pmutationLabel, 0, 10);
 		grid.add(pmutation, 1, 10);
-		
+
 		final Label scaleLabel = new Label("Współczynnik skalowania");
 		// scaleLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
 		scaleLabel.setMinWidth(200);
@@ -101,19 +102,19 @@ public class Main extends Application {
 		scale = new TextField();
 		scale.setText("1.4");
 		scale.setMinHeight(minH);
-		
+
 		grid.add(scale, 1, 11);
 
 		final Button wyczyśćBtn = new Button("Wyczyść wykres");
 		wyczyśćBtn.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent e) {
-				
-				if(isWykres)
+
+				if (isWykres)
 					grid.getChildren().remove(wykres);
 
 				stage.setWidth(paramTab.widthProperty().doubleValue());
-				isWykres=false;
+				isWykres = false;
 			}
 		});
 
@@ -121,22 +122,23 @@ public class Main extends Application {
 		rysujBtn.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent e) {
-				
+
 				oblicz(Integer.parseInt(popSize.getText()),
 						Integer.parseInt(genSize.getText()),
 						Double.parseDouble(pcross.getText()),
 						Double.parseDouble(pmutation.getText()),
 						Double.parseDouble(scale.getText()),
 						fitFunction.getText());
-				
-				if(!isWykres){
-					paramTab.prefWidthProperty().bind(grid.widthProperty().divide(2));
+
+				if (!isWykres) {
+					paramTab.prefWidthProperty().bind(
+							grid.widthProperty().divide(2));
 					stage.setWidth(2.0 * grid.widthProperty().doubleValue());
-				} else{
+				} else {
 					grid.getChildren().remove(wykres);
 				}
 				grid.add(addChart(), 2, 0, 1, 13);
-				isWykres=true;
+				isWykres = true;
 			}
 		});
 
@@ -161,7 +163,7 @@ public class Main extends Application {
 		hbBtn.getChildren().addAll(wyczyśćBtn, rysujBtn);
 		hbBtn.setSpacing(20);
 		grid.add(hbBtn, 0, 13, 2, 1);
-		
+
 		grid.prefWidthProperty().bind(stage.widthProperty());
 		grid.prefHeightProperty().bind(stage.heightProperty());
 
@@ -188,7 +190,8 @@ public class Main extends Application {
 		paramNameCol
 				.setCellValueFactory(new PropertyValueFactory<Parameter, String>(
 						"name"));
-		TableColumn paramSizeCol = new TableColumn("Liczba pozycji\n kodujących");
+		TableColumn paramSizeCol = new TableColumn(
+				"Liczba bitów\nkodujących\nparametr");
 		paramSizeCol
 				.setCellValueFactory(new PropertyValueFactory<Parameter, String>(
 						"length"));
@@ -201,15 +204,19 @@ public class Main extends Application {
 		TableColumn paramMaxCol = new TableColumn("Max");
 		paramMaxCol
 				.setCellValueFactory(new PropertyValueFactory<Parameter, String>(
-						"maxparm"));	
-		paramNameCol.prefWidthProperty().bind(paramTab.widthProperty().divide(4));
-		paramSizeCol.prefWidthProperty().bind(paramTab.widthProperty().divide(4.1));
-		paramMinCol.prefWidthProperty().bind(paramTab.widthProperty().divide(4));
-		paramMaxCol.prefWidthProperty().bind(paramTab.widthProperty().divide(4));
-		//paramNameCol.setPrefWidth(120);
-		//paramSizeCol.setPrefWidth(134);
-		//paramMinCol.setPrefWidth(90);
-		//paramMaxCol.setPrefWidth(90);
+						"maxparm"));
+		paramNameCol.prefWidthProperty().bind(
+				paramTab.widthProperty().divide(4));
+		paramSizeCol.prefWidthProperty().bind(
+				paramTab.widthProperty().divide(4.1));
+		paramMinCol.prefWidthProperty()
+				.bind(paramTab.widthProperty().divide(4));
+		paramMaxCol.prefWidthProperty()
+				.bind(paramTab.widthProperty().divide(4));
+		// paramNameCol.setPrefWidth(120);
+		// paramSizeCol.setPrefWidth(134);
+		// paramMinCol.setPrefWidth(90);
+		// paramMaxCol.setPrefWidth(90);
 		zakresCols.getColumns().addAll(paramMinCol, paramMaxCol);
 
 		titleCol.getColumns().addAll(paramNameCol, paramSizeCol, zakresCols);
@@ -217,7 +224,7 @@ public class Main extends Application {
 		paramTab.prefHeightProperty().bind(stage.heightProperty().divide(1.4));
 		paramTab.prefWidthProperty().bind(stage.widthProperty());
 		paramTab.setItems(data);
-		grid.add(paramTab, 0, 1,2,1);
+		grid.add(paramTab, 0, 1, 2, 1);
 
 		final TextField addName = new TextField();
 		addName.setPromptText("Nazwa parametru");
@@ -231,25 +238,49 @@ public class Main extends Application {
 		final TextField addMaxVal = new TextField();
 		addMaxVal.setPromptText("Max");
 		addMaxVal.setMinHeight(minH);
-		
+		addName.setVisible(false);
+		addLength.setVisible(false);
+		addMinVal.setVisible(false);
+		addMaxVal.setVisible(false);
+
 		addName.prefWidthProperty().bind(stage.widthProperty().divide(4));
 		addLength.prefWidthProperty().bind(stage.widthProperty().divide(4));
 		addMinVal.prefWidthProperty().bind(stage.widthProperty().divide(4));
 		addMaxVal.prefWidthProperty().bind(stage.widthProperty().divide(4));
-
-		final Button addButton = new Button("Dodaj");
+		
+		
+		final Button addButton = new Button("Dodaj parametr");
 		addButton.setMinWidth(100);
 		addButton.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent e) {
-				data.add(new Parameter(addName.getText(), addLength.getText(),
-						addMinVal.getText(), addMaxVal.getText()));
-				addName.clear();
-				addLength.clear();
-				addMinVal.clear();
-				addMaxVal.clear();
+				if (dodawanie) {
+					data.add(new Parameter(addName.getText(), addLength
+							.getText(), addMinVal.getText(), addMaxVal
+							.getText()));
+					addName.clear();
+					addLength.clear();
+					addMinVal.clear();
+					addMaxVal.clear();
+					addName.setVisible(false);
+					addLength.setVisible(false);
+					addMinVal.setVisible(false);
+					addMaxVal.setVisible(false);
+					addButton.prefWidthProperty().bind(stage.widthProperty().divide(2));
+					addButton.setText("Dodaj parametr");
+					dodawanie = false;
+				} else{
+					dodawanie = true;
+					addButton.prefWidthProperty().bind(stage.widthProperty().divide(4));
+					addButton.setText("Dodaj");
+					addName.setVisible(true);
+					addLength.setVisible(true);
+					addMinVal.setVisible(true);
+					addMaxVal.setVisible(true);
+				}
 			}
 		});
+		addButton.prefWidthProperty().bind(stage.widthProperty().divide(2));
 		HBox addingBox = new HBox();
 		addingBox.getChildren().addAll(addName, addLength, addMinVal,
 				addMaxVal, addButton);
