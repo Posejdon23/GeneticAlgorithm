@@ -1,66 +1,67 @@
 package ag1;
 
-import org.apache.commons.jexl2.Expression;
-import org.apache.commons.jexl2.JexlContext;
-import org.apache.commons.jexl2.JexlEngine;
-import org.apache.commons.jexl2.MapContext;
+import de.congrace.exp4j.Calculable;
+import de.congrace.exp4j.ExpressionBuilder;
+import de.congrace.exp4j.UnknownFunctionException;
+import de.congrace.exp4j.UnparsableExpressionException;
 
 /**
- *
+ * 
  * @author kamil
  */
 public class Unit {
-		
-	public Unit(ParamSpec ps, String allel,String funkcja){
-            
-		this.allel=allel;
-        this.params = Funkcje.dekoduj(ps, allel, 2);
+
+	public Unit(ParamSpec ps, String allel, String funkcja) {
+
+		this.allel = allel;
+		this.params = Funkcje.dekoduj(ps, allel, 2);
 		this.fx = fPrzystosowania(funkcja);
 	}
+
 	private String allel;
 	private double fx;
-    private Parameter[] params;
-	
-    private static final JexlEngine jexl = new JexlEngine();
-    static {
-       jexl.setCache(512);
-       jexl.setLenient(false);
-       jexl.setSilent(false);
-    }
+	private Parameter[] params;
+
+	// private static final JexlEngine jexl = new JexlEngine();
+	// static {
+	// jexl.setCache(512);
+	// jexl.setLenient(false);
+	// jexl.setSilent(false);
+
+	// }
 	public String getAllel() {
 		return allel;
 	}
+
 	public double getFx() {
 		return fx;
 	}
+
 	public void setFx(double fx) {
 		this.fx = fx;
 	}
-        private double fPrzystosowania(String funkcja){
-        	
-		    Expression e = (Expression) jexl.createExpression(funkcja);
-		    JexlContext context = new MapContext();
-		    
-		    for(Parameter p : params)
-		    context.set(p.getName(), p.getValue());
-		    
-		    double wynik = 0;
-		    Object num = e.evaluate(context);
-		    if(num.getClass().equals(Long.class)){
-		    	//System.out.println("Long" + wynik);
-		    	wynik = ((Long)num).doubleValue();
-		    }
-			if(num.getClass().equals(Double.class)){
-				wynik= ((Double)num).doubleValue();	 
-				//System.out.println("Double" + wynik);
-			}
-			if(num.getClass().equals(Float.class)){
-				wynik= ((Float)num).doubleValue();	
-			//	System.out.println("Float" + wynik);
-			}
-			if(wynik<0) wynik=0.0d;
-		    return wynik;
 
-        }
+	private double fPrzystosowania(String funkcja) {
+
+		// Expression e = (Expression) jexl.createExpression(funkcja);
+		// JexlContext context = new MapContext();
+
+		ExpressionBuilder eb = new ExpressionBuilder(funkcja);
+		for (Parameter p : params)
+			eb.withVariable(p.getName(), p.getValue());
+
+		Calculable calc = null;
+		try {
+			calc = eb.build();
+		} catch (UnknownFunctionException | UnparsableExpressionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		double wynik = calc.calculate();
+
+		if (wynik < 0)
+			wynik = 0.0d;
+		return wynik;
+
+	}
 }
-
