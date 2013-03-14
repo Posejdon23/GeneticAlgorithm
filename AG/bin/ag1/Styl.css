@@ -28,6 +28,9 @@
     -fx-text-fill: white;
     -fx-opacity: 1;
 }
+#error {
+	 -fx-text-fill: red;
+}
 
 .table-view {
   -fx-base: #1d1d1d;
@@ -217,4 +220,12 @@
 }
 .axis {
 	-fx-tick-unit:1;
+}
+.tabPane {
+	-fx-base: #1d1d1d;
+  -fx-control-inner-background: #1d1d1d;
+  -fx-background-color: #1d1d1d;
+  -fx-table-cell-border-color: white;
+  -fx-table-header-border-color: white;
+  -fx-padding: 0;
 }

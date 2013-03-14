@@ -4,6 +4,8 @@
  */
 package ag1;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Random;
 
 public class Funkcje {
@@ -11,9 +13,10 @@ public class Funkcje {
     private static double PMUTATION;
     private static double PCROSS;
     private static double mnożnikSkalowania;
-    public static int licznikGen=0;
+    public static int licznikGen=1;
     public static int liczbaGen;
     public static String fitFunction;
+    public static StringBuilder sbOpis = new StringBuilder();
 
     public static Unit[] genGen(ParamSpec ps, int popsize, int length,
             int lGen, double PMUTATION, double PCROSS,double scale, String fitFunction) {
@@ -36,10 +39,23 @@ public class Funkcje {
             }
             newpop[i] = new Unit(ps, sb.toString(),fitFunction);
         }
+        sbOpis.append(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+        sbOpis.append("\n\nPrzegląd populacji w kolejnych generacjach " +
+        		"\ndla następujących parametrów algorytmu:\n" +
+        		"Liczba generacji: " + lGen + "\nWielkość populacji: " + popsize +
+        		"\nPrawdopodobieństwo krzyżowania: " + PCROSS +
+        		"\nPrawdopodobieństwo mutacji: " + PMUTATION +
+        		"\nWspółczynnik skalowania: " + scale);
+
+        sbOpis.append("\n\n------- GENERACJA 0(LOSOWA)------- \n\n");
+        for(Unit p : newpop)
+        	sbOpis.append(p.getAllel()+"\n");
+        	
         return newpop;
 
     }
-public static int wybierz(double sumaFit, Unit populacja[]) {
+    
+    public static int wybierz(double sumaFit, Unit populacja[]) {
         int popsize = populacja.length;
         double[] fxy = new double[popsize];
         for (int j = 0; j < popsize; j++) {
@@ -66,7 +82,7 @@ public static int wybierz(double sumaFit, Unit populacja[]) {
         double[] stats = (double[]) obj[1];
         
         double sumfitness = 0;
-        for (int j = 0; j < popsize; j = j + 2) {
+        for (int j = 0; j < popsize-1; j = j + 2) {
             sumfitness = 0;
             for (int i = 0; i < popsize; i++) {
                 sumfitness += oldpop[i].getFx();
@@ -96,6 +112,12 @@ public static int wybierz(double sumaFit, Unit populacja[]) {
 //                }
 //            } 
         }
+        
+        sbOpis.append("\n---------- GENERACJA " + licznikGen + " ------------\n\n");
+        
+        for(Unit p : newpop)
+        	sbOpis.append(p.getAllel()+"\n");
+        
         licznikGen++;
         return new Object[]{newpop,stats};
     }
@@ -150,6 +172,10 @@ public static int wybierz(double sumaFit, Unit populacja[]) {
 
     
         double[] stats = new double[]{minFit2, maxFit2, sumaFit2, średniaFit2};
+        sbOpis.append("\nStatystyki generacji "+ (licznikGen-1)+": " +"\nMinimalna wartość f. przystosowania: " 
+        + minFit2 + "\nMaksymalna wartość f. przystosowania: " + maxFit2 + 
+        		"\nSuma przystosowania populacji: " + sumaFit2 + 
+        		"\nŚrednie przystosowanie: " + średniaFit2 +"\n");
         Object[] objects = new Object[]{populacja, stats};
         
         return objects;
