@@ -16,19 +16,18 @@ import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableColumn.CellEditEvent;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.RowConstraints;
 import javafx.scene.layout.StackPane;
-import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
@@ -42,8 +41,10 @@ public class Main extends Application {
 	private double[][] stats;
 	private TableView<Parameter> paramTab = new TableView<Parameter>();
 	private final ObservableList<Parameter> data = FXCollections
-			.observableArrayList(new Parameter("a", "10", "-5.12", "5.12"),
-					new Parameter("b", "10", "-5.12", "5.12"));
+			.observableArrayList(new Parameter("a", "3", "0", "7"),
+					new Parameter("b", "3", "0", "7"),
+					new Parameter("c", "3", "0", "7"),
+					new Parameter("d", "3", "0", "7"));
 	private TextField fitFunction, popSize, genSize, pcross, pmutation, scale;
 	private LineChart<Number, Number> wykres;
 	private Stage stage;
@@ -77,7 +78,7 @@ public class Main extends Application {
 		fitFunctionLabel.setMinWidth(200);
 		gridMenu.add(fitFunctionLabel, 0, 3, 1, 1);
 		fitFunction = new TextField();
-		fitFunction.setText("a+b");
+		fitFunction.setText("a-b+c-d");
 		fitFunction.setMinHeight(minH);
 		gridMenu.add(fitFunction, 1, 3, 1, 1);
 
@@ -91,7 +92,7 @@ public class Main extends Application {
 		genSizeLabel = new Label("Liczba generacji");
 		gridMenu.add(genSizeLabel, 0, 7);
 		genSize = new TextField();
-		genSize.setText("20");
+		genSize.setText("50");
 		genSize.setMinHeight(minH);
 		gridMenu.add(genSize, 1, 7);
 
@@ -463,24 +464,37 @@ public class Main extends Application {
 	private void tabelaSettings(final GridPane grid) {
 
 		TableColumn titleCol = new TableColumn("Parametry osobników");
+		paramTab.setEditable(true);
+		
 		TableColumn paramNameCol = new TableColumn("Nazwa");
 		paramNameCol
 				.setCellValueFactory(new PropertyValueFactory<Parameter, String>(
 						"name"));
+		paramNameCol.setCellFactory(TextFieldTableCell.forTableColumn());
+		paramNameCol.setOnEditCommit(
+            new EventHandler<CellEditEvent<Parameter, String>>() {
+                @Override
+                public void handle(CellEditEvent<Parameter, String> t) {
+                    ((Parameter) t.getTableView().getItems().get(
+                            t.getTablePosition().getRow())
+                            ).setName(t.getNewValue());
+                }
+            }
+        );
+		
 		TableColumn paramSizeCol = new TableColumn(
 				"Liczba bitów\nkodujących\nparametr");
 		paramSizeCol
 				.setCellValueFactory(new PropertyValueFactory<Parameter, String>(
 						"length"));
+		
 		TableColumn zakresCols = new TableColumn("Zakres Wartości");
 		zakresCols.setPrefWidth(180);
 		TableColumn paramMinCol = new TableColumn("Min");
-		paramMinCol
-				.setCellValueFactory(new PropertyValueFactory<Parameter, String>(
+		paramMinCol.setCellValueFactory(new PropertyValueFactory<Parameter, String>(
 						"minparm"));
 		TableColumn paramMaxCol = new TableColumn("Max");
-		paramMaxCol
-				.setCellValueFactory(new PropertyValueFactory<Parameter, String>(
+		paramMaxCol.setCellValueFactory(new PropertyValueFactory<Parameter, String>(
 						"maxparm"));
 		paramNameCol.prefWidthProperty().bind(
 				paramTab.widthProperty().divide(4));
@@ -493,6 +507,7 @@ public class Main extends Application {
 		zakresCols.getColumns().addAll(paramMinCol, paramMaxCol);
 
 		titleCol.getColumns().addAll(paramNameCol, paramSizeCol, zakresCols);
+		
 		paramTab.getColumns().addAll(titleCol);
 		paramTab.prefHeightProperty().bind(stage.heightProperty().divide(1.4));
 		paramTab.prefWidthProperty().bind(stage.widthProperty());

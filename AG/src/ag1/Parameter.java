@@ -31,6 +31,9 @@ public class Parameter {
         this.minparm = new SimpleDoubleProperty(Double.parseDouble(s3));
         this.maxparm = new SimpleDoubleProperty(Double.parseDouble(s4));
     }
+    public void setName(String name){
+    	this.name.set(name);
+    }
 
     public int getLength() {
         return length.get();
@@ -42,6 +45,9 @@ public class Parameter {
 
     public void setLength(int length) {
         this.length.set(length);
+    }
+    public void setLength(SimpleIntegerProperty sip){
+    	this.length = sip;
     }
 
     public double getValue() {
