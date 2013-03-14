@@ -11,9 +11,7 @@ import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Button;
-import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
-import javafx.scene.control.MenuItem;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
@@ -25,11 +23,14 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.RowConstraints;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 import de.congrace.exp4j.Calculable;
 import de.congrace.exp4j.ExpressionBuilder;
@@ -41,8 +42,8 @@ public class Main extends Application {
 	private double[][] stats;
 	private TableView<Parameter> paramTab = new TableView<Parameter>();
 	private final ObservableList<Parameter> data = FXCollections
-			.observableArrayList(new Parameter("a", "5", "-10", "10"),
-					new Parameter("b", "5", "-10", "10"));
+			.observableArrayList(new Parameter("a", "10", "-5.12", "5.12"),
+					new Parameter("b", "10", "-5.12", "5.12"));
 	private TextField fitFunction, popSize, genSize, pcross, pmutation, scale;
 	private LineChart<Number, Number> wykres;
 	private Stage stage;
@@ -58,7 +59,7 @@ public class Main extends Application {
 			pmutationLabel, scaleLabel;
 	private ParamSpec ps;
 	private SplitPane sp;
-	private StackPane sp1,sp2;
+	private StackPane sp1, sp2;
 	private HBox addingBox;
 	private Button removeBtn;
 
@@ -67,10 +68,12 @@ public class Main extends Application {
 
 		this.stage = stage;
 		gridMenu = new GridPane();
+		gridMenu.setVgap(5);
 		tabelaSettings(gridMenu);
-		
+
 		fitFunctionLabel = new Label("Funkcja przystosowania");
-		// fitFunctionLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
+		fitFunctionLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
+		fitFunctionLabel.setStyle("-fx-textfill: white");
 		fitFunctionLabel.setMinWidth(200);
 		gridMenu.add(fitFunctionLabel, 0, 3, 1, 1);
 		fitFunction = new TextField();
@@ -79,7 +82,6 @@ public class Main extends Application {
 		gridMenu.add(fitFunction, 1, 3, 1, 1);
 
 		popSizeLabel = new Label("Wielkość populacji");
-		// popSizeLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
 		gridMenu.add(popSizeLabel, 0, 5);
 		popSize = new TextField();
 		popSize.setText("100");
@@ -87,7 +89,6 @@ public class Main extends Application {
 		gridMenu.add(popSize, 1, 5);
 
 		genSizeLabel = new Label("Liczba generacji");
-		// genSizeLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
 		gridMenu.add(genSizeLabel, 0, 7);
 		genSize = new TextField();
 		genSize.setText("20");
@@ -95,13 +96,11 @@ public class Main extends Application {
 		gridMenu.add(genSize, 1, 7);
 
 		pcrossLabel = new Label("Ppb. krzyżowania");
-		// pcrossLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
 		pcross = new TextField();
 		pcross.setText("0.6");
 		pcross.setMinHeight(minH);
 
 		pmutationLabel = new Label("Ppb mutacji");
-		// pmutationLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
 		pmutation = new TextField();
 		pmutation.setText("0.01");
 		pmutation.setMinHeight(minH);
@@ -112,11 +111,10 @@ public class Main extends Application {
 		gridMenu.add(pmutation, 1, 10);
 
 		scaleLabel = new Label("Współczynnik skalowania");
-		// scaleLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
 		scaleLabel.setMinWidth(200);
 		gridMenu.add(scaleLabel, 0, 11);
 		scale = new TextField();
-		scale.setText("1.4");
+		scale.setText("1.2");
 		scale.setMinHeight(minH);
 
 		gridMenu.add(scale, 1, 11);
@@ -158,30 +156,30 @@ public class Main extends Application {
 					if (!isWykres) {
 						stage.setWidth(2.0 * gridMenu.widthProperty()
 								.doubleValue());
-					} 
+					}
 					tab3.setDisable(false);
 					wyczyśćBtn.setText("Schowaj wykres");
 					taPrzegląd.setText(Funkcje.sbOpis.toString());
 					Funkcje.sbOpis.delete(0, Funkcje.sbOpis.length());
 					Funkcje.licznikGen = 0;
 					wyczyśćBtn.setVisible(true);
-					
-					if(!sp2.getChildren().isEmpty())
+
+					if (!sp2.getChildren().isEmpty())
 						sp2.getChildren().remove(wykres);
-					
+
 					sp2.getChildren().add(addChart());
-					
-					if(sp.getItems().size()==1)
+
+					if (sp.getItems().size() == 1)
 						sp.getItems().add(sp2);
 					tabPane.getSelectionModel().select(2);
 					isWykres = true;
-				} else{
-					if(isWykres){
+				} else {
+					if (isWykres) {
 						stage.setWidth(0.5 * stage.widthProperty()
-							.doubleValue());
+								.doubleValue());
 						sp.getItems().remove(1);
 						wyczyśćBtn.setText("Pokaż wykres");
-						isWykres=false;
+						isWykres = false;
 					}
 				}
 			}
@@ -195,7 +193,6 @@ public class Main extends Application {
 						wyczyśćBtn.setEffect(shadow);
 					}
 				});
-		// Removing the shadow when the mouse cursor is off
 		wyczyśćBtn.addEventHandler(MouseEvent.MOUSE_EXITED,
 				new EventHandler<MouseEvent>() {
 					@Override
@@ -210,9 +207,6 @@ public class Main extends Application {
 		hbBtn.setSpacing(20);
 		gridMenu.add(hbBtn, 0, 13, 2, 1);
 
-		//gridMenu.prefWidthProperty().bind(stage.widthProperty());
-		//gridMenu.prefHeightProperty().bind(stage.heightProperty());
-
 		tabPane = new TabPane();
 		Tab tab1 = new Tab();
 		tab1.setContent(gridMenu);
@@ -220,7 +214,7 @@ public class Main extends Application {
 
 		Tab tab2 = new Tab();
 		tab2.setText("Objaśnienia");
-
+		tab2.setContent(objaśnienia());
 		tab3 = new Tab();
 		tab3.setText("Wyniki");
 		setPrzegląd();
@@ -234,15 +228,16 @@ public class Main extends Application {
 		tab3.setDisable(true);
 
 		tabPane.getTabs().addAll(tab1, tab2, tab3);
-		
+
 		sp = new SplitPane();
 		sp1 = new StackPane();
 		sp2 = new StackPane();
-		
+		sp2.setMinWidth(15);
+
 		sp1.getChildren().add(tabPane);
 
 		sp.getItems().addAll(sp1);
-		
+
 		Scene scene = new Scene(sp, 500, 600);
 		stage.centerOnScreen();
 		stage.setMinHeight(500);
@@ -254,6 +249,67 @@ public class Main extends Application {
 		stage.setScene(scene);
 		this.stage.getIcons().add(new Image("file:resources/images/icon.png"));
 		stage.show();
+	}
+
+	private TextArea objaśnienia() {
+		TextArea ta = new TextArea();
+		ta.setWrapText(true);
+		ta.setEditable(false);
+		ta.setText("\n\t\t\t\t\tTABELA\n\nTabela zawiera informacje o parametrach " +
+				"wpisanych w allel każdego osobnika. Po wprowadzeniu do tabeli, nazwy " +
+				"parametrów można stosować w polu \"Funkcja przystosowania\". Liczba " +
+				"bitów kodujących określa ile bitów zostanie przeznaczonych na " +
+				"zakodowanie danego parametru. Od tej wartości zależy dokładność z " +
+				"jaką mierzony będzie parametr."
+				
+				+ "\n\n\t\t\tFUNKCJA PRZYSTOSOWANIA\n\nDo dyspozycji mamy parser o " +
+				"następujacych możliwościach:\n\n"
+				+ "Dodawanie: 2 + 2"
+				+ "\nOdejmowanie: 2 - 2"
+				+ "\nMnożenie: 2 * 2"
+				+ "\nDzielenie: 2 / 2"
+				+ "\nPierwiastek: sqrt()"
+				+ "\nFunkcja wykładnicza: 2 ^ 2"
+				+ "\nJednoargumentowe znaki +/-: +2 - (-2)"
+				+ "\nReszta z dzielenia: 2 % 2"
+				+ "\nWartość bezwzględna: abs()"
+				+ "\nFunkcja eksponencjalna: exp()"
+				+ "\nCosinus: cos()"
+				+ "\nSinus: sin()"
+				+ "\nTangens: tan()"
+				+ "\nArcus cosinus: acos()"
+				+ "\nArcus sinus: asin()"
+				+ "\nArcus tangens: atan()"
+				+ "\nCosinus hiperboliczny cosh()"
+				+ "\nSinus hiperboliczny: sinh()"
+				+ "\nTangens hiperboliczny: tanh()"
+				+ "\nPierwiastek sześcienny: cbrt()"
+				+ "\nFunkcja sufit: ceil()"
+				+ "\nFunkcja podłoga: floor()"
+				+ "\nLogarytm naturalny o podstawie e: log()"
+				+ "\n\nUżyty parser to exp4j, pobrany z:"
+				+ "\nhttp://www.objecthunter.net/exp4j/\n"
+				
+				+ "\n\t\t\t\t\tWIELKOŚĆ POPULACJI\n\nOkreślia liczbę osobników w populacji. "
+				+ "Wartość ta musi być nieujemna i parzysta"
+				+ "(osobniki dobierane są w pary podczas krzyżowania)."
+				
+				+ "\n\n\t\t\t\t\tLICZBA GENERACJI\n\n Wartość nieujemna." +
+				
+				"\n\n\t\tPRAWDOPODOBIEŃSTWO KRZYŻOWANIA\n\nWspółczynnik określający" +
+				" z jakim prawdopodobieństwem osobniki w populacji będą się ze sobą " +
+				"krzyżować. Wartość z przedziału [0, 1]." +
+				"\n\n\t\t\tPRAWDOPODOBIEŃSTWO MUTACJI\n\nOkreśla prawdopodobieństwo zajścia"
+				+ "pojedyńczej mutacji(czyli zamiany 0 na 1 lub odwrotnie) podczas " +
+				"krzyżowania." +
+				"\n\n\t\tWSPÓŁCZYNNIK SKALOWANIA(LINIOWEGO)\n\nStosowany  w celu " +
+				"zapewnienia odpowiedniego poziomu konkurencji podczas wykonywania " +
+				"algorytmu. Początkowo pomniejsza wartości funkcji przystosowania " +
+				"\"superosobników\" aby nie opanowali populacji. W poźniejszej fazie " +
+				"wartości te są zwiększane w celu wyróżnienia " +
+				"lepiej przystosowanych, bądź zmniejszane przeciętnym " +
+				"osobnikom.");
+		return ta;
 	}
 
 	private boolean checkNoErrors() {
@@ -269,7 +325,6 @@ public class Main extends Application {
 		boolean bezBłędu = true;
 		boolean formatError = false;
 
-		
 		try {
 			ExpressionBuilder eb = new ExpressionBuilder(fitFunction.getText());
 			ps = new ParamSpec();
@@ -284,105 +339,123 @@ public class Main extends Application {
 
 			Calculable calc = null;
 			calc = eb.build();
-		} catch (IllegalArgumentException | UnknownFunctionException | UnparsableExpressionException e) {
+			fitFunctionLabel.setId(null);
+		} catch (IllegalArgumentException | UnknownFunctionException
+				| UnparsableExpressionException e) {
 			bezBłędu = false;
-			gridMenu.add(new Label(
-					"Niepoprawne wyrażenie."), 0,
-					pozycja++, 2, 1);
-			fitFunctionLabel.setTextFill(Color.RED);
+			Label l = new Label(
+					"Niepoprawne wyrażenie w funkcji przystosowania.");
+			l.setId("error-label");
+			gridMenu.add(l, 0, pozycja++, 2, 1);
+			fitFunctionLabel.setId("error-label");
 		}
 
 		try {
 			if (Integer.parseInt(popSize.getText()) < 1) {
-				gridMenu.add(new Label(
-						"Wielkość populacji powinna być większa niż 1."), 0,
-						pozycja++, 2, 1);
-				popSizeLabel.setTextFill(Color.RED);
+				Label l = new Label(
+						"Populacja powinna liczyć conajmniej 2 osobników.");
+				l.setId("error-label");
+				gridMenu.add(l, 0, pozycja++, 2, 1);
+				popSizeLabel.setId("error-label");
 				bezBłędu = false;
+				throw new NumberFormatException();
+
 			} else if (Integer.parseInt(popSize.getText()) % 2 != 0) {
-				gridMenu.add(new Label(
-						"Wielkość populacji powinna być liczbą parzystą."), 0,
-						pozycja++, 2, 1);
-				popSizeLabel.setTextFill(Color.RED);
+				Label l = new Label("Populacja powinna składać się z"
+						+ " parzystej liczby osobników.");
+				l.setId("error-label");
+				gridMenu.add(l, 0, pozycja++, 2, 1);
+				popSizeLabel.setId("error-label");
 				bezBłędu = false;
+				throw new NumberFormatException();
 			}
+			popSizeLabel.setId(null);
 		} catch (NumberFormatException e) {
 			formatError = true;
-			popSizeLabel.setTextFill(Color.RED);
+			popSizeLabel.setId("error-label");
 			bezBłędu = false;
 		}
 		try {
 			Integer.parseInt(genSize.getText());
 			if (Integer.parseInt(genSize.getText()) <= 1) {
-				gridMenu.add(new Label(
-						"Liczba generacji powinna być większa niż 1."), 0,
-						pozycja++, 2, 1);
-				popSizeLabel.setTextFill(Color.RED);
+
+				Label l = new Label(
+						"Liczba generacji powinna być większa niż 1.");
+				gridMenu.add(l, 0, pozycja++, 2, 1);
+				l.setId("error-label");
+				genSizeLabel.setId("error-label");
 				bezBłędu = false;
+				throw new NumberFormatException();
 			}
+			genSizeLabel.setId(null);
 		} catch (NumberFormatException e) {
 			formatError = true;
-			genSizeLabel.setTextFill(Color.RED);
+			genSizeLabel.setId("error-label");
 			bezBłędu = false;
 		}
 		try {
 			if (Double.parseDouble(pcross.getText()) < 0
 					|| Double.parseDouble(pcross.getText()) > 1) {
-				gridMenu.add(new Label("Ppb. krzyżowania powinno "
-						+ "to liczba z przedziału [0, 1]."), 0, pozycja++, 2, 1);
-				genSizeLabel.setTextFill(Color.RED);
+				Label l = new Label("Ppb. krzyżowania powinno "
+						+ "to liczba z przedziału [0, 1].");
+				l.setId("error-label");
+				gridMenu.add(l, 0, pozycja++, 2, 1);
+				pcrossLabel.setId("error-label");
 				bezBłędu = false;
+				throw new NumberFormatException();
 			}
+			pcrossLabel.setId(null);
 		} catch (NumberFormatException e) {
 			formatError = true;
-			pcrossLabel.setTextFill(Color.RED);
+			pcrossLabel.setId("error-label");
 			bezBłędu = false;
 		}
 		try {
 			if (Double.parseDouble(pmutation.getText()) < 0
 					|| Double.parseDouble(pmutation.getText()) > 1) {
-				gridMenu.add(new Label(
-						"Ppb. mutacji to liczba z przedziału [0, 1]."), 0,
-						pozycja++, 2, 1);
-				genSizeLabel.setTextFill(Color.RED);
+				Label l = new Label(
+						"Ppb. mutacji to liczba z przedziału [0, 1].");
+				l.setId("error-label");
+				gridMenu.add(l, 0, pozycja++, 2, 1);
+				pmutationLabel.setId("error-label");
 				bezBłędu = false;
+				throw new NumberFormatException();
 			}
+			pmutationLabel.setId(null);
 		} catch (NumberFormatException e) {
 			formatError = true;
-			pcrossLabel.setTextFill(Color.RED);
-			bezBłędu = false;
-		}
-		try {
-			Double.parseDouble(pmutation.getText());
-		} catch (NumberFormatException e) {
-			formatError = true;
-			pmutationLabel.setTextFill(Color.RED);
+			pmutationLabel.setId("error-label");
 			bezBłędu = false;
 		}
 		try {
 			if (Double.parseDouble(scale.getText()) < 0) {
-				gridMenu.add(new Label(
-						"Wsp. skalowania powinien być większy od 0."), 0,
-						pozycja++, 2, 1);
-				scaleLabel.setTextFill(Color.RED);
+				Label l = new Label(
+						"Wsp. skalowania powinien być większy od 0.");
+				l.setId("error-label");
+				gridMenu.add(l, 0, pozycja++, 2, 1);
+				scaleLabel.setId("error-label");
 				bezBłędu = false;
+				throw new NumberFormatException();
 			}
+			scaleLabel.setId(null);
 		} catch (NumberFormatException e) {
 			formatError = true;
-			scaleLabel.setTextFill(Color.RED);
+			scaleLabel.setId("error-label");
 			bezBłędu = false;
 		}
 		if (formatError) {
-			gridMenu.add(new Label("Błąd formatu liczby."), 0, pozycja++, 2, 1);
+			Label l = new Label("Błąd formatu liczby.");
+			l.setId("error-label");
+			gridMenu.add(l, 0, pozycja++, 2, 1);
 		}
 		if (bezBłędu) {
-			fitFunctionLabel.setTextFill(Color.WHITE);
-			popSizeLabel.setTextFill(Color.WHITE);
-			genSizeLabel.setTextFill(Color.WHITE);
-			pcrossLabel.setTextFill(Color.WHITE);
-			pmutationLabel.setTextFill(Color.WHITE);
-			scaleLabel.setTextFill(Color.WHITE);
-		} 
+			fitFunctionLabel.setId(null);
+			popSizeLabel.setId(null);
+			genSizeLabel.setId(null);
+			pcrossLabel.setId(null);
+			pmutationLabel.setId(null);
+			scaleLabel.setId(null);
+		}
 		return bezBłędu;
 	}
 
@@ -430,7 +503,7 @@ public class Main extends Application {
 		addName.setPromptText("Nazwa parametru");
 		addName.setMinHeight(minH);
 		final TextField addLength = new TextField();
-		addLength.setPromptText("Długość");
+		addLength.setPromptText("Liczba bitów");
 		addLength.setMinHeight(minH);
 		final TextField addMinVal = new TextField();
 		addMinVal.setPromptText("Min");
@@ -456,38 +529,40 @@ public class Main extends Application {
 			@Override
 			public void handle(ActionEvent e) {
 				if (dodawanie) {
-					try{
-						if(Integer.parseInt(addLength.getText())<1){
+					try {
+						if (Integer.parseInt(addLength.getText()) < 1) {
 							throw new NumberFormatException();
 						}
-					data.add(new Parameter(addName.getText(), addLength
-							.getText(), addMinVal.getText(), addMaxVal
-							.getText()));
-					addName.clear();
-					addLength.clear();
-					addMinVal.clear();
-					addMaxVal.clear();
-					addingBox.getChildren().removeAll(addName,addLength,addMinVal,addMaxVal);
-					addingBox.getChildren().add(removeBtn);
-					addButton.prefWidthProperty().bind(
-							stage.widthProperty().divide(2));
-					addButton.setText("Dodaj parametr");
-					dodawanie = false;
-					} catch(NumberFormatException ex){
-						
+						data.add(new Parameter(addName.getText(), addLength
+								.getText(), addMinVal.getText(), addMaxVal
+								.getText()));
+						addName.clear();
+						addLength.clear();
+						addMinVal.clear();
+						addMaxVal.clear();
+						addingBox.getChildren().removeAll(addName, addLength,
+								addMinVal, addMaxVal);
+						addingBox.getChildren().add(removeBtn);
+						addButton.prefWidthProperty().bind(
+								stage.widthProperty().divide(2));
+						addButton.setText("Dodaj parametr");
+						dodawanie = false;
+					} catch (NumberFormatException ex) {
+
 					}
-					
+
 				} else {
 					dodawanie = true;
 					addButton.prefWidthProperty().bind(
 							stage.widthProperty().divide(4));
 					addButton.setText("Dodaj");
-					addingBox.getChildren().remove(removeBtn);
-					addingBox.getChildren().addAll(addName,addLength,addMinVal,addMaxVal);
+					addingBox.getChildren().removeAll(removeBtn, addButton);
+					addingBox.getChildren().addAll(addName, addLength,
+							addMinVal, addMaxVal, addButton);
 				}
 			}
 		});
-		
+
 		removeBtn = new Button("Usuń parametr");
 		removeBtn.setMinWidth(100);
 		removeBtn.setMaxWidth(200);
@@ -499,9 +574,9 @@ public class Main extends Application {
 		});
 		addButton.prefWidthProperty().bind(stage.widthProperty().divide(2));
 		removeBtn.prefWidthProperty().bind(stage.widthProperty().divide(2));
-		
+
 		addingBox = new HBox();
-		addingBox.getChildren().addAll(addButton,removeBtn);
+		addingBox.getChildren().addAll(addButton, removeBtn);
 		addingBox.setSpacing(7);
 		addingBox.alignmentProperty().set(Pos.CENTER_RIGHT);
 		addingBox.prefWidthProperty().bind(paramTab.widthProperty());

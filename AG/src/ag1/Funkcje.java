@@ -144,7 +144,7 @@ public class Funkcje {
         int popsize = populacja.length;
         double minFit2 = populacja[0].getFx();
         double maxFit2 = minFit2;
-        double sumaFit2 = 0;
+        long sumaFit2 = 0;
         double fitness2 = 0;
 
         for (int i = 0; i < popsize; i++) {
@@ -161,7 +161,6 @@ public class Funkcje {
         }
         double średniaFit2 = sumaFit2 / popsize;
 
-    
         double[] stats = new double[]{minFit2, maxFit2, sumaFit2, średniaFit2};
         sbOpis.append("\nStatystyki generacji "+ (licznikGen-1)+": " +"\nMinimalna wartość f. przystosowania: " 
         + minFit2 + "\nMaksymalna wartość f. przystosowania: " + maxFit2 + 
