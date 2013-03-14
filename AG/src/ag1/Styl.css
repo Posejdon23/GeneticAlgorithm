@@ -3,7 +3,7 @@
     -fx-background-color: #1d1d1d;
 }
 .grid-pane{
-	-fx-background-color: #1d1d1d; 
+	-fx-background-color: black;
 	-fx-grid-lines-visible: true;
 	-fx-opacity: 1;
 }
@@ -18,7 +18,8 @@
 .label-bright {
     -fx-font-size: 15pt;
     -fx-font-family: "Segoe UI Semibold";
-    -fx-text-fill: black;
+    -fx-text-fill: white;
+    -fx-background-color: black;
     -fx-opacity: 1;
 }
 
@@ -107,7 +108,8 @@
 }
 
 .split-pane {
-    -fx-padding: 1 0 0 0;
+    -fx-padding: 0 0 0 0;
+    -fx-background-color: black;
 }
 
 .menu-bar {
@@ -221,11 +223,44 @@
 .axis {
 	-fx-tick-unit:1;
 }
-.tabPane {
+.tab-pane {
 	-fx-base: #1d1d1d;
   -fx-control-inner-background: #1d1d1d;
   -fx-background-color: #1d1d1d;
   -fx-table-cell-border-color: white;
   -fx-table-header-border-color: white;
-  -fx-padding: 0;
+  -fx-padding: 0,0,50,0;
+}
+.chart {
+    -fx-padding: 10px;
+    -fx-background-image: url("icon.png");   
+}
+.chart-content {
+    -fx-padding: 30px;    
+}
+ 
+.chart-title {
+  -fx-text-fill: white;
+  -fx-font-size: 1.5em;
+}
+ 
+.axis-label {
+  -fx-text-fill: white;
+}
+ 
+.chart-legend {
+   -fx-background-color:  white;
+   -fx-padding: 20px;
+}
+ 
+.chart-legend-item-symbol{
+   -fx-background-radius: 90;
+}
+ 
+.chart-legend-item{
+    -fx-text-fill: black;
+}
+#taPrzeglad {
+	-fx-background-color:  white;
+	-fx-text-fill: black;
 }

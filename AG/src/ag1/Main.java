@@ -4,9 +4,7 @@ import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.event.Event;
 import javafx.event.EventHandler;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.chart.LineChart;
@@ -16,6 +14,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TableColumn;
@@ -26,10 +25,16 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import de.congrace.exp4j.Calculable;
+import de.congrace.exp4j.ExpressionBuilder;
+import de.congrace.exp4j.UnknownFunctionException;
+import de.congrace.exp4j.UnparsableExpressionException;
 
 public class Main extends Application {
 
@@ -41,40 +46,29 @@ public class Main extends Application {
 	private TextField fitFunction, popSize, genSize, pcross, pmutation, scale;
 	private LineChart<Number, Number> wykres;
 	private Stage stage;
-	private GridPane gridMenu, gridAll, gridWykres;
+	private GridPane gridMenu;
 	private boolean isWykres = false;
 	private boolean dodawanie = false;
 	private double minH = 30;
+	private Parameter[] params;
 	private Tab tab3;
 	private TabPane tabPane;
 	private TextArea taPrzegląd;
 	private Label fitFunctionLabel, popSizeLabel, genSizeLabel, pcrossLabel,
-			pmutationLabel, scaleLabel, error;
+			pmutationLabel, scaleLabel;
+	private ParamSpec ps;
+	private SplitPane sp;
+	private StackPane sp1,sp2;
+	private HBox addingBox;
+	private Button removeBtn;
 
 	@Override
 	public void start(final Stage stage) {
 
 		this.stage = stage;
-		gridAll = new GridPane();
-		gridAll.setHgap(10);
-		gridAll.setVgap(10);
-		gridAll.setPadding(new Insets(10, 10, 25, 25));
-		gridAll.setStyle("-fx-background-color:#1d1d1d");
-
-		gridWykres = new GridPane();
-		gridWykres.setHgap(10);
-		gridWykres.setVgap(10);
-		gridWykres.setPadding(new Insets(10, 10, 25, 25));
-		gridWykres.setStyle("-fx-background-color:#1d1d1d");
-
 		gridMenu = new GridPane();
-		gridMenu.setAlignment(Pos.TOP_LEFT);
-		gridMenu.setHgap(10);
-		gridMenu.setVgap(10);
-		gridMenu.setPadding(new Insets(10, 10, 25, 25));
-		gridMenu.setStyle("-fx-background-color:#1d1d1d");
-		wykresSettings(gridMenu);
-
+		tabelaSettings(gridMenu);
+		
 		fitFunctionLabel = new Label("Funkcja przystosowania");
 		// fitFunctionLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
 		fitFunctionLabel.setMinWidth(200);
@@ -124,9 +118,6 @@ public class Main extends Application {
 		scale = new TextField();
 		scale.setText("1.4");
 		scale.setMinHeight(minH);
-		
-		error = new Label("");
-		
 
 		gridMenu.add(scale, 1, 11);
 
@@ -137,17 +128,13 @@ public class Main extends Application {
 			public void handle(ActionEvent e) {
 				wyczyśćBtn.setVisible(true);
 				if (isWykres) {
-					gridMenu.getChildren().remove(wykres);
-					paramTab.prefWidthProperty().bind(
-							gridMenu.widthProperty().divide(2));
+					sp.getItems().remove(1);
 					stage.setWidth(0.5 * gridMenu.widthProperty().doubleValue());
 					wyczyśćBtn.setText("Pokaż wykres");
 					isWykres = false;
 				} else {
-					gridMenu.getChildren().add(wykres);
+					sp.getItems().add(sp2);
 					isWykres = true;
-					paramTab.prefWidthProperty().bind(
-							gridMenu.widthProperty().divide(2));
 					stage.setWidth(2.0 * gridMenu.widthProperty().doubleValue());
 					wyczyśćBtn.setText("Schowaj wykres");
 				}
@@ -160,7 +147,7 @@ public class Main extends Application {
 			@Override
 			public void handle(ActionEvent e) {
 
-				if (checkErrors()) {
+				if (checkNoErrors()) {
 					oblicz(Integer.parseInt(popSize.getText()),
 							Integer.parseInt(genSize.getText()),
 							Double.parseDouble(pcross.getText()),
@@ -169,21 +156,33 @@ public class Main extends Application {
 							fitFunction.getText());
 
 					if (!isWykres) {
-						paramTab.prefWidthProperty().bind(
-								gridMenu.widthProperty().divide(2));
 						stage.setWidth(2.0 * gridMenu.widthProperty()
 								.doubleValue());
-					} else {
-						gridMenu.getChildren().remove(wykres);
-					}
+					} 
 					tab3.setDisable(false);
 					wyczyśćBtn.setText("Schowaj wykres");
 					taPrzegląd.setText(Funkcje.sbOpis.toString());
 					Funkcje.sbOpis.delete(0, Funkcje.sbOpis.length());
 					Funkcje.licznikGen = 0;
 					wyczyśćBtn.setVisible(true);
-					gridMenu.add(addChart(), 2, 0, 1, 13);
+					
+					if(!sp2.getChildren().isEmpty())
+						sp2.getChildren().remove(wykres);
+					
+					sp2.getChildren().add(addChart());
+					
+					if(sp.getItems().size()==1)
+						sp.getItems().add(sp2);
+					tabPane.getSelectionModel().select(2);
 					isWykres = true;
+				} else{
+					if(isWykres){
+						stage.setWidth(0.5 * stage.widthProperty()
+							.doubleValue());
+						sp.getItems().remove(1);
+						wyczyśćBtn.setText("Pokaż wykres");
+						isWykres=false;
+					}
 				}
 			}
 		});
@@ -211,8 +210,8 @@ public class Main extends Application {
 		hbBtn.setSpacing(20);
 		gridMenu.add(hbBtn, 0, 13, 2, 1);
 
-		gridMenu.prefWidthProperty().bind(stage.widthProperty());
-		gridMenu.prefHeightProperty().bind(stage.heightProperty());
+		//gridMenu.prefWidthProperty().bind(stage.widthProperty());
+		//gridMenu.prefHeightProperty().bind(stage.heightProperty());
 
 		tabPane = new TabPane();
 		Tab tab1 = new Tab();
@@ -223,45 +222,33 @@ public class Main extends Application {
 		tab2.setText("Objaśnienia");
 
 		tab3 = new Tab();
-		tab3.setText("Przegląd populacji");
+		tab3.setText("Wyniki");
 		setPrzegląd();
-		tab3.setContent(taPrzegląd);
+		HBox h = new HBox();
+		h.getChildren().addAll(taPrzegląd);
+		tab3.setContent(h);
 
 		tab1.setClosable(false);
 		tab2.setClosable(false);
 		tab3.setClosable(false);
 		tab3.setDisable(true);
-		tabPane.setOnMouseClicked(new EventHandler<Event>() {
-			@Override
-			public void handle(Event event) {
-				if (!tabPane.getSelectionModel().isSelected(0)) {
-					if (isWykres) {
-						paramTab.prefWidthProperty().bind(
-								gridMenu.widthProperty().divide(2));
-						stage.setWidth(0.5 * gridMenu.widthProperty()
-								.doubleValue());
-						isWykres = true;
-					}
-				} else {
-					if (isWykres) {
-						paramTab.prefWidthProperty().bind(
-								gridMenu.widthProperty().divide(2));
-						stage.setWidth(2.0 * gridMenu.widthProperty()
-								.doubleValue());
-					}
-				}
-			}
-		});
 
 		tabPane.getTabs().addAll(tab1, tab2, tab3);
+		
+		sp = new SplitPane();
+		sp1 = new StackPane();
+		sp2 = new StackPane();
+		
+		sp1.getChildren().add(tabPane);
 
-		Scene scene = new Scene(tabPane, 500, 600);
+		sp.getItems().addAll(sp1);
+		
+		Scene scene = new Scene(sp, 500, 600);
 		stage.centerOnScreen();
 		stage.setMinHeight(500);
 		stage.setMinWidth(500);
 
 		stage.setTitle("Prosty algorytm genetyczny");
-
 		scene.getStylesheets().add(
 				Main.class.getResource("Styl.css").toExternalForm());
 		stage.setScene(scene);
@@ -269,92 +256,138 @@ public class Main extends Application {
 		stage.show();
 	}
 
-	private boolean checkErrors() {
-		/*
-		 * Integer.parseInt(popSize.getText()),
-		 * Integer.parseInt(genSize.getText()),
-		 * Double.parseDouble(pcross.getText()),
-		 * Double.parseDouble(pmutation.getText()),
-		 * Double.parseDouble(scale.getText()), fitFunction.getText());
-		 */
-		StringBuilder sb = new StringBuilder();
-		
+	private boolean checkNoErrors() {
+
+		int pozycja = 15;
+		int sizeMenu = gridMenu.getChildren().size();
+		if (sizeMenu > 15) {
+			for (int i = pozycja; i < sizeMenu; i++) {
+				gridMenu.getChildren()
+						.remove(gridMenu.getChildren().size() - 1);
+			}
+		}
 		boolean bezBłędu = true;
+		boolean formatError = false;
+
+		
+		try {
+			ExpressionBuilder eb = new ExpressionBuilder(fitFunction.getText());
+			ps = new ParamSpec();
+			params = new Parameter[data.size()];
+			data.toArray(params);
+			for (Parameter p : params) {
+				ps.addParam(p.getName(), p.getLength(), p.getMinparm(),
+						p.getMaxparm());
+			}
+			for (Parameter p : params)
+				eb.withVariable(p.getName(), p.getValue());
+
+			Calculable calc = null;
+			calc = eb.build();
+		} catch (IllegalArgumentException | UnknownFunctionException | UnparsableExpressionException e) {
+			bezBłędu = false;
+			gridMenu.add(new Label(
+					"Niepoprawne wyrażenie."), 0,
+					pozycja++, 2, 1);
+			fitFunctionLabel.setTextFill(Color.RED);
+		}
 
 		try {
-			if(Integer.parseInt(popSize.getText())<1){
-				sb.append("Wielkość populacji powinna być większa niż 1.\n");
+			if (Integer.parseInt(popSize.getText()) < 1) {
+				gridMenu.add(new Label(
+						"Wielkość populacji powinna być większa niż 1."), 0,
+						pozycja++, 2, 1);
 				popSizeLabel.setTextFill(Color.RED);
-				bezBłędu=false;
-			} else if(Integer.parseInt(popSize.getText()) % 2 != 0){
-				sb.append("Wielkość populacji powinna być liczbą parzystą.\n");
+				bezBłędu = false;
+			} else if (Integer.parseInt(popSize.getText()) % 2 != 0) {
+				gridMenu.add(new Label(
+						"Wielkość populacji powinna być liczbą parzystą."), 0,
+						pozycja++, 2, 1);
 				popSizeLabel.setTextFill(Color.RED);
-				bezBłędu=false;
+				bezBłędu = false;
 			}
 		} catch (NumberFormatException e) {
-			sb.append("Błąd formatu liczby\n");
+			formatError = true;
 			popSizeLabel.setTextFill(Color.RED);
 			bezBłędu = false;
 		}
 		try {
 			Integer.parseInt(genSize.getText());
-			if(Integer.parseInt(genSize.getText())<1){
-				sb.append("Liczba generacji powinna być większa niż 1.\n");
+			if (Integer.parseInt(genSize.getText()) <= 1) {
+				gridMenu.add(new Label(
+						"Liczba generacji powinna być większa niż 1."), 0,
+						pozycja++, 2, 1);
 				popSizeLabel.setTextFill(Color.RED);
-				bezBłędu=false;
+				bezBłędu = false;
 			}
 		} catch (NumberFormatException e) {
-			sb.append("Błąd formatu liczby\n");
+			formatError = true;
 			genSizeLabel.setTextFill(Color.RED);
 			bezBłędu = false;
 		}
 		try {
-			if(Double.parseDouble(pcross.getText()) < 0 || 
-					Double.parseDouble(pcross.getText())> 1){
-				sb.append("Ppb. krzyżowania powinno być liczbą z przedziału [0, 1].\n");
+			if (Double.parseDouble(pcross.getText()) < 0
+					|| Double.parseDouble(pcross.getText()) > 1) {
+				gridMenu.add(new Label("Ppb. krzyżowania powinno "
+						+ "to liczba z przedziału [0, 1]."), 0, pozycja++, 2, 1);
 				genSizeLabel.setTextFill(Color.RED);
 				bezBłędu = false;
 			}
 		} catch (NumberFormatException e) {
-			sb.append("Błąd formatu liczby\n");
+			formatError = true;
+			pcrossLabel.setTextFill(Color.RED);
+			bezBłędu = false;
+		}
+		try {
+			if (Double.parseDouble(pmutation.getText()) < 0
+					|| Double.parseDouble(pmutation.getText()) > 1) {
+				gridMenu.add(new Label(
+						"Ppb. mutacji to liczba z przedziału [0, 1]."), 0,
+						pozycja++, 2, 1);
+				genSizeLabel.setTextFill(Color.RED);
+				bezBłędu = false;
+			}
+		} catch (NumberFormatException e) {
+			formatError = true;
 			pcrossLabel.setTextFill(Color.RED);
 			bezBłędu = false;
 		}
 		try {
 			Double.parseDouble(pmutation.getText());
 		} catch (NumberFormatException e) {
-			sb.append("Błąd formatu liczby\n");
+			formatError = true;
 			pmutationLabel.setTextFill(Color.RED);
 			bezBłędu = false;
 		}
 		try {
-			Double.parseDouble(scale.getText());
+			if (Double.parseDouble(scale.getText()) < 0) {
+				gridMenu.add(new Label(
+						"Wsp. skalowania powinien być większy od 0."), 0,
+						pozycja++, 2, 1);
+				scaleLabel.setTextFill(Color.RED);
+				bezBłędu = false;
+			}
 		} catch (NumberFormatException e) {
-			sb.append("Błąd formatu liczby\n");
+			formatError = true;
 			scaleLabel.setTextFill(Color.RED);
 			bezBłędu = false;
 		}
-		
-		
-		if(bezBłędu){
+		if (formatError) {
+			gridMenu.add(new Label("Błąd formatu liczby."), 0, pozycja++, 2, 1);
+		}
+		if (bezBłędu) {
 			fitFunctionLabel.setTextFill(Color.WHITE);
 			popSizeLabel.setTextFill(Color.WHITE);
 			genSizeLabel.setTextFill(Color.WHITE);
 			pcrossLabel.setTextFill(Color.WHITE);
 			pmutationLabel.setTextFill(Color.WHITE);
 			scaleLabel.setTextFill(Color.WHITE);
-			gridMenu.getChildren().remove(error);
-		}else {
-			error.setText(sb.toString());
-			error.setId("error");
-			gridMenu.add(error, 0, 14, 3, 5);
-		}
-		
+		} 
 		return bezBłędu;
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	private void wykresSettings(final GridPane grid) {
+	private void tabelaSettings(final GridPane grid) {
 
 		TableColumn titleCol = new TableColumn("Parametry osobników");
 		TableColumn paramNameCol = new TableColumn("Nazwa");
@@ -405,10 +438,10 @@ public class Main extends Application {
 		final TextField addMaxVal = new TextField();
 		addMaxVal.setPromptText("Max");
 		addMaxVal.setMinHeight(minH);
-		addName.setVisible(false);
-		addLength.setVisible(false);
-		addMinVal.setVisible(false);
-		addMaxVal.setVisible(false);
+		addName.setVisible(true);
+		addLength.setVisible(true);
+		addMinVal.setVisible(true);
+		addMaxVal.setVisible(true);
 
 		addName.prefWidthProperty().bind(stage.widthProperty().divide(4));
 		addLength.prefWidthProperty().bind(stage.widthProperty().divide(4));
@@ -417,10 +450,16 @@ public class Main extends Application {
 
 		final Button addButton = new Button("Dodaj parametr");
 		addButton.setMinWidth(100);
+		addButton.setMaxWidth(200);
 		addButton.setOnAction(new EventHandler<ActionEvent>() {
+
 			@Override
 			public void handle(ActionEvent e) {
 				if (dodawanie) {
+					try{
+						if(Integer.parseInt(addLength.getText())<1){
+							throw new NumberFormatException();
+						}
 					data.add(new Parameter(addName.getText(), addLength
 							.getText(), addMinVal.getText(), addMaxVal
 							.getText()));
@@ -428,44 +467,45 @@ public class Main extends Application {
 					addLength.clear();
 					addMinVal.clear();
 					addMaxVal.clear();
-					addName.setVisible(false);
-					addLength.setVisible(false);
-					addMinVal.setVisible(false);
-					addMaxVal.setVisible(false);
+					addingBox.getChildren().removeAll(addName,addLength,addMinVal,addMaxVal);
+					addingBox.getChildren().add(removeBtn);
 					addButton.prefWidthProperty().bind(
 							stage.widthProperty().divide(2));
 					addButton.setText("Dodaj parametr");
 					dodawanie = false;
+					} catch(NumberFormatException ex){
+						
+					}
+					
 				} else {
 					dodawanie = true;
 					addButton.prefWidthProperty().bind(
 							stage.widthProperty().divide(4));
 					addButton.setText("Dodaj");
-					addName.setVisible(true);
-					addLength.setVisible(true);
-					addMinVal.setVisible(true);
-					addMaxVal.setVisible(true);
+					addingBox.getChildren().remove(removeBtn);
+					addingBox.getChildren().addAll(addName,addLength,addMinVal,addMaxVal);
 				}
 			}
 		});
-		addButton.prefWidthProperty().bind(stage.widthProperty().divide(2));
-		HBox addingBox = new HBox();
-		addingBox.getChildren().addAll(addName, addLength, addMinVal,
-				addMaxVal, addButton);
-		addingBox.setSpacing(7);
-		addingBox.prefWidthProperty().bind(paramTab.widthProperty());
-		grid.add(addingBox, 0, 2, 2, 1);
-		final ContextMenu contextMenu = new ContextMenu();
-
-		MenuItem item1 = new MenuItem("Usuń parametr");
-		item1.setOnAction(new EventHandler<ActionEvent>() {
+		
+		removeBtn = new Button("Usuń parametr");
+		removeBtn.setMinWidth(100);
+		removeBtn.setMaxWidth(200);
+		removeBtn.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
 			public void handle(ActionEvent e) {
-
 				data.remove(paramTab.getSelectionModel().getSelectedItem());
 			}
 		});
-		contextMenu.getItems().addAll(item1);
-		paramTab.setContextMenu(contextMenu);
+		addButton.prefWidthProperty().bind(stage.widthProperty().divide(2));
+		removeBtn.prefWidthProperty().bind(stage.widthProperty().divide(2));
+		
+		addingBox = new HBox();
+		addingBox.getChildren().addAll(addButton,removeBtn);
+		addingBox.setSpacing(7);
+		addingBox.alignmentProperty().set(Pos.CENTER_RIGHT);
+		addingBox.prefWidthProperty().bind(paramTab.widthProperty());
+		grid.add(addingBox, 0, 2, 2, 1);
 	}
 
 	public static void main(String[] args) {
@@ -474,14 +514,13 @@ public class Main extends Application {
 
 	private void oblicz(int popSize, int genSize, double pcross,
 			double pmutation, double scale, String fitFunction) {
-		ParamSpec ps = new ParamSpec();
-		Parameter[] params = new Parameter[data.size()];
+		ps = new ParamSpec();
+		params = new Parameter[data.size()];
 		data.toArray(params);
 		for (Parameter p : params) {
 			ps.addParam(p.getName(), p.getLength(), p.getMinparm(),
 					p.getMaxparm());
 		}
-		// liczba generacji,wielkość populacji(PARZYSTA! >?)
 		NewPop np = new NewPop(ps, genSize, popSize, fitFunction);
 		stats = np.populate(pcross, pmutation, scale); // min,max, sum,avg
 
@@ -490,12 +529,12 @@ public class Main extends Application {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private LineChart addChart() {
 		final NumberAxis xAxis = new NumberAxis();
-		xAxis.setLabel("Numer generacji");
+		xAxis.setLabel("Generacja");
 		final NumberAxis yAxis = new NumberAxis();
-		yAxis.setLabel("Wartości funkcji przystosowania");
+		yAxis.setLabel("Wartość funkcji przystosowania");
 		wykres = new LineChart<Number, Number>(xAxis, yAxis);
 
-		wykres.setTitle("Wykres przystosowania dla kolejnych generacji");
+		wykres.setTitle("Wykres przystosowania generacji");
 		wykres.prefWidthProperty().bind(gridMenu.widthProperty().divide(2));
 		wykres.prefHeightProperty().bind(gridMenu.heightProperty());
 		XYChart.Series series1 = new XYChart.Series();
@@ -526,10 +565,10 @@ public class Main extends Application {
 
 	private void setPrzegląd() {
 		taPrzegląd = new TextArea();
+		taPrzegląd.setId("taPrzeglad");
 		taPrzegląd.setEditable(false);
 		taPrzegląd.setPrefRowCount(10);
 		taPrzegląd.setPrefColumnCount(100);
 		taPrzegląd.setWrapText(true);
-		taPrzegląd.setPrefWidth(150);
 	}
 }

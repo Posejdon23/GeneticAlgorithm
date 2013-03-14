@@ -22,13 +22,6 @@ public class Unit {
 	private double fx;
 	private Parameter[] params;
 
-	// private static final JexlEngine jexl = new JexlEngine();
-	// static {
-	// jexl.setCache(512);
-	// jexl.setLenient(false);
-	// jexl.setSilent(false);
-
-	// }
 	public String getAllel() {
 		return allel;
 	}
@@ -43,9 +36,6 @@ public class Unit {
 
 	private double fPrzystosowania(String funkcja) {
 
-		// Expression e = (Expression) jexl.createExpression(funkcja);
-		// JexlContext context = new MapContext();
-
 		ExpressionBuilder eb = new ExpressionBuilder(funkcja);
 		for (Parameter p : params)
 			eb.withVariable(p.getName(), p.getValue());
@@ -54,8 +44,7 @@ public class Unit {
 		try {
 			calc = eb.build();
 		} catch (UnknownFunctionException | UnparsableExpressionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.out.println("Błąd się wydostał");
 		}
 		double wynik = calc.calculate();
 

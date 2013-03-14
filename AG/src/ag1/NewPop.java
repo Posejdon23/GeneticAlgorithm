@@ -20,7 +20,7 @@ public class NewPop {
 
     public double[][] populate(double pcross,double pmutation,double scale) {
         Unit[] populacja = Funkcje.genGen(ps, wielkośćPopulacji, długośćCiągu,
-                liczbaGeneracji,pmutation,pcross, scale, fitFunction); // ostatnie tylko dla wyswietlania w reprodukcji
+                liczbaGeneracji,pmutation,pcross, scale, fitFunction);
         for (int i = 1; i <= liczbaGeneracji; i++) {    
             Object[] popIstat = Funkcje.reprodukcja(ps, populacja);
             populacja = (Unit[]) popIstat[0];       
